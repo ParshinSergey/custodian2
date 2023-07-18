@@ -13,7 +13,7 @@ public class DeckraServiceController {
         // System.out.println(request.getURI());
         System.out.println(headers.toString());
         System.out.println(str);
-        return "successful !!!";
+        return "successful !!";
 
     }
 }
