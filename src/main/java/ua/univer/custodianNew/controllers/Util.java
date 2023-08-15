@@ -103,7 +103,8 @@ public final class Util {
         tName.setShortName(shortName);
         tCustomer.setName(tName);
 
-        var addresses = new TCustomer.Addresses();
+
+       /* var addresses = new TCustomer.Addresses();
         Taddress address = new Taddress();
         if(form.getAddressType() != null){
         switch (form.getAddressType().toUpperCase().trim()){
@@ -122,6 +123,31 @@ public final class Util {
         address.setFlat(form.getFlat());
         address.setAddressFree(form.getAddressFree());
         addresses.getAddress().add(address);
+        tCustomer.setAddresses(addresses);*/
+
+
+        var addresses = new TCustomer.Addresses();
+        if (form.getAddressFree() != null) {
+            String[] arrAddress = form.getAddressFree().split("фактична адреса згідно довідки ВПО", 2);
+            Taddress address = new Taddress();
+            address.setAddressType(TAddressType.LEGAL);
+            address.setCountry(form.getCountryAdr());
+            address.setPostIndex(form.getPostIndex());
+            address.setRegion(form.getRegion());
+            address.setDistrict(form.getDistrict());
+            address.setLocality(form.getLocality());
+            address.setStreet(form.getStreet());
+            address.setHouse(form.getHouse());
+            address.setFlat(form.getFlat());
+            address.setAddressFree(arrAddress[0].trim());
+            addresses.getAddress().add(address);
+            if (arrAddress.length > 1) {
+                Taddress address2 = new Taddress();
+                address2.setAddressType(TAddressType.POST);
+                address2.setAddressFree(arrAddress[1].trim());
+                addresses.getAddress().add(address2);
+            }
+        }
         tCustomer.setAddresses(addresses);
 
         TdocFO document = new TdocFO();

@@ -4,10 +4,7 @@ import dmt.custodian2016.*;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ua.univer.custodianNew.dto.FormSearch;
 import ua.univer.custodianNew.util.ConverterUtil;
 import ua.univer.custodianNew.util.DateTimeUtil;
@@ -28,6 +25,50 @@ public class BalanceController extends BaseController {
 
     @GetMapping(value = "/account")
     public ResponseEntity<String> balanceAccount(@RequestBody FormSearch form) throws IOException {
+
+        logger.info("Method Balance.");
+
+        Request request = new Request();
+
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
+        tHeaderRequest.setRequestType("BalanceV2");
+        request.setHeader(tHeaderRequest);
+
+        TBalanceRequest balance = new TBalanceRequest();
+        balance.setAccount(form.getAccount());
+        if (form.getIsin() != null) {
+            var tisin = new TISIN();
+            tisin.setISIN(form.getIsin());
+            tisin.setDepositary(form.getDepositary());
+            balance.setISIN(tisin);
+        }
+        balance.setDateState(DateTimeUtil.oneBoxCalendar(form.getDateState()));
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setBalance(balance);
+
+        request.setBody(tbodyRequest);
+
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "Balance");
+        Responce responce = getResponceFromXml(deckraResponse);
+        String jsonResponse = ConverterUtil.objectToJson(responce);
+
+        if (responce == null) {
+            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
+        } else {
+            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())){
+                String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
+                return ResponseEntity.badRequest().body(answer);
+            }
+            else {
+                //String answer = answer(responce);
+                return ResponseEntity.ok().body(jsonResponse);
+            }
+        }
+    }
+
+    @PostMapping(value = "/account")
+    public ResponseEntity<String> balanceAccPost(@RequestBody FormSearch form) throws IOException {
 
         logger.info("Method Balance.");
 
