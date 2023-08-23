@@ -23,10 +23,11 @@ public class BalanceController extends BaseController {
         super(marshaller, httpClient);
     }
 
-    @GetMapping(value = "/account")
+    @PostMapping(value = "/account")
     public ResponseEntity<String> balanceAccount(@RequestBody FormSearch form) throws IOException {
 
-        logger.info("Method Balance.");
+        logger.info("Method BalanceV2.");
+        long time = System.nanoTime();
 
         Request request = new Request();
 
@@ -62,23 +63,40 @@ public class BalanceController extends BaseController {
             }
             else {
                 //String answer = answer(responce);
+                logger.info("time is " + (System.nanoTime() - time)/1000000 + " ms");
                 return ResponseEntity.ok().body(jsonResponse);
             }
         }
     }
 
-    @PostMapping(value = "/account")
-    public ResponseEntity<String> balanceAccPost(@RequestBody FormSearch form) throws IOException {
+    @PostMapping(value = "/accountV2")
+    public ResponseEntity<String> balanceAccV2(@RequestBody FormSearch form) throws IOException {
 
-        logger.info("Method Balance.");
+        logger.info("Statement_of_HoldingsV2.");
+        long time = System.nanoTime();
 
         Request request = new Request();
 
         THeaderRequest tHeaderRequest = Util.getHeaderRequest();
-        tHeaderRequest.setRequestType("BalanceV2");
+        tHeaderRequest.setRequestType("Statement_of_HoldingsV2");
         request.setHeader(tHeaderRequest);
 
-        TBalanceRequest balance = new TBalanceRequest();
+        TStatementOfHoldingsRequest statement = new TStatementOfHoldingsRequest();
+        statement.setAccount(form.getAccount());
+        if (form.getIsin() != null) {
+            var tisin = new TISIN();
+            tisin.setISIN(form.getIsin());
+            tisin.setDepositary(form.getDepositary());
+            statement.setISIN(tisin);
+        }
+        statement.setDateState(DateTimeUtil.oneBoxCalendar(form.getDateState()));
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setStatementOfHoldingsRequest(statement);
+
+
+
+       /* TBalanceRequest balance = new TBalanceRequest();
         balance.setAccount(form.getAccount());
         if (form.getIsin() != null) {
             var tisin = new TISIN();
@@ -89,11 +107,11 @@ public class BalanceController extends BaseController {
         balance.setDateState(DateTimeUtil.oneBoxCalendar(form.getDateState()));
 
         TbodyRequest tbodyRequest = new TbodyRequest();
-        tbodyRequest.setBalance(balance);
+        tbodyRequest.setBalance(balance);*/
 
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "Balance");
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "Statement");
         Responce responce = getResponceFromXml(deckraResponse);
         String jsonResponse = ConverterUtil.objectToJson(responce);
 
@@ -106,6 +124,7 @@ public class BalanceController extends BaseController {
             }
             else {
                 //String answer = answer(responce);
+                logger.info("time is " + (System.nanoTime() - time)/1000000 + " ms");
                 return ResponseEntity.ok().body(jsonResponse);
             }
         }

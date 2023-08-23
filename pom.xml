@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>ua.univer</groupId>
 	<artifactId>custodianNew</artifactId>
-	<version>1.0.7</version>
+	<version>1.0.8</version>
 	<name>custodianNew</name>
 	<description>External System for Custodian2016 API</description>
 	<properties>
@@ -39,6 +39,14 @@
 			<version>4.0.2</version>
 			<scope>runtime</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.28</version>
+			<scope>provided</scope>
+		</dependency>
+
 
 		<!--Swagger-->
 		<dependency>

@@ -2,8 +2,13 @@ package ua.univer.custodianNew.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class FormFO {
 
     @NotBlank
@@ -60,7 +65,7 @@ public class FormFO {
     private String docDateStop;
     private String docSDRnumber;
 
-    @Size(min = 6, max = 6)
+    @Size(max = 6)
     private String mfo;
     @Size(max = 34)
     private String iban;
@@ -75,34 +80,66 @@ public class FormFO {
     private String bic;
     @Size(max = 20)
     private String lei;
-    private Integer bankDetailID;
+    //private Integer bankDetailID;
     private boolean use4Income;
     private Integer type;
 
+    @Size(max = 6)
+    private String mfo1;
     @Size(max = 34)
     private String iban1;
+    @Size(max = 50)
+    private String cardAccount1;
+    @Size(max = 80)
+    private String bankName1;
     @Pattern(regexp = "^\\d{3}$", message = "должно состоять из трех цифр")
     private String currency1;
+    @Size(max = 14)
+    private String bic1;
+    @Size(max = 20)
+    private String lei1;
     private boolean use4Income1;
     private Integer type1;
 
+    @Size(max = 6)
+    private String mfo2;
     @Size(max = 34)
     private String iban2;
+    @Size(max = 50)
+    private String cardAccount2;
+    @Size(max = 80)
+    private String bankName2;
     @Pattern(regexp = "^\\d{3}$", message = "должно состоять из трех цифр")
     private String currency2;
+    @Size(max = 14)
+    private String bic2;
+    @Size(max = 20)
+    private String lei2;
     private boolean use4Income2;
     private Integer type2;
 
+    @Size(max = 6)
+    private String mfo3;
     @Size(max = 34)
     private String iban3;
+    @Size(max = 50)
+    private String cardAccount3;
+    @Size(max = 80)
+    private String bankName3;
     @Pattern(regexp = "^\\d{3}$", message = "должно состоять из трех цифр")
     private String currency3;
+    @Size(max = 14)
+    private String bic3;
+    @Size(max = 20)
+    private String lei3;
     private boolean use4Income3;
     private Integer type3;
 
     private String phone;
     private String mobilePhone;
     @Email
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private String eMailGeneral;
     private String birthDate;
     private String birthPlace;
@@ -126,7 +163,15 @@ public class FormFO {
     public FormFO() {
     }
 
-    public String getRequestID() {
+    public String geteMailGeneral() {
+        return eMailGeneral;
+    }
+
+    public void seteMailGeneral(String eMailGeneral) {
+        this.eMailGeneral = eMailGeneral;
+    }
+
+   /* public String getRequestID() {
         return requestID;
     }
 
@@ -667,5 +712,5 @@ public class FormFO {
 
     public void setBrokerAgrID(Integer brokerAgrID) {
         this.brokerAgrID = brokerAgrID;
-    }
+    }*/
 }

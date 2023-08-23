@@ -128,7 +128,8 @@ public final class Util {
 
         var addresses = new TCustomer.Addresses();
         if (form.getAddressFree() != null) {
-            String[] arrAddress = form.getAddressFree().split("фактична адреса згідно довідки ВПО", 2);
+            String phrase = "фактична адреса згідно довідки ВПО";
+            String[] arrAddress = form.getAddressFree().split(phrase, 2);
             Taddress address = new Taddress();
             address.setAddressType(TAddressType.LEGAL);
             address.setCountry(form.getCountryAdr());
@@ -144,7 +145,7 @@ public final class Util {
             if (arrAddress.length > 1) {
                 Taddress address2 = new Taddress();
                 address2.setAddressType(TAddressType.POST);
-                address2.setAddressFree(arrAddress[1].trim());
+                address2.setAddressFree(phrase + " " + arrAddress[1].trim());
                 addresses.getAddress().add(address2);
             }
         }
@@ -161,26 +162,33 @@ public final class Util {
         document.setDocSDRnumber(form.getDocSDRnumber());
         tCustomer.setDocFO(document);
 
-        TBankDetail bankDetail = new TBankDetail();
-        bankDetail.setMFO(form.getMfo());
-        bankDetail.setIBAN(form.getIban());
-        bankDetail.setCardAccount(form.getCardAccount());
-        bankDetail.setBankName(form.getBankName());
-        bankDetail.setCurrency(form.getCurrency());
-        bankDetail.setBIC(form.getBic());
-        bankDetail.setLEI(form.getLei());
-        if (form.getBankDetailID() != null) {
-            bankDetail.setBankDetailID(new BigInteger(form.getBankDetailID().toString()));
-        }
-        if (form.isUse4Income()) {
-            bankDetail.setUse4Income(form.isUse4Income());
-        }
-        if (form.getType() != null) {
-            bankDetail.setType(new BigInteger(form.getType().toString()));
-        }
-        var bankDetails = new TCustomer.BankDetails();
-        bankDetails.getBankDetail().add(bankDetail);
 
+
+        var bankDetails = new TCustomer.BankDetails();
+        if (form.getType() != null && StringUtils.hasLength(form.getIban())) {
+            TBankDetail bankDetail = getBankDetail(form.getMfo(), form.getIban(), form.getCardAccount(), form.getBankName(),
+                    form.getCurrency(), form.getBic(), form.getLei(), form.isUse4Income(), form.getType());
+            bankDetails.getBankDetail().add(bankDetail);
+        }
+        if (form.getType1() != null && StringUtils.hasLength(form.getIban1())) {
+            TBankDetail bankDetail1 = getBankDetail(form.getMfo1(), form.getIban1(), form.getCardAccount1(), form.getBankName1(),
+                    form.getCurrency1(), form.getBic1(), form.getLei1(), form.isUse4Income1(), form.getType1());
+            bankDetails.getBankDetail().add(bankDetail1);
+        }
+        if (form.getType2() != null && StringUtils.hasLength(form.getIban2())) {
+            TBankDetail bankDetail2 = getBankDetail(form.getMfo2(), form.getIban2(), form.getCardAccount2(), form.getBankName2(),
+                    form.getCurrency2(), form.getBic2(), form.getLei2(), form.isUse4Income2(), form.getType2());
+            bankDetails.getBankDetail().add(bankDetail2);
+        }
+        if (form.getType3() != null && StringUtils.hasLength(form.getIban3())) {
+            TBankDetail bankDetail3 = getBankDetail(form.getMfo3(), form.getIban3(), form.getCardAccount3(), form.getBankName3(),
+                    form.getCurrency3(), form.getBic3(), form.getLei3(), form.isUse4Income3(), form.getType3());
+            bankDetails.getBankDetail().add(bankDetail3);
+        }
+        tCustomer.setBankDetails(bankDetails);
+
+
+/*
         if (form.getType1() != null && StringUtils.hasLength(form.getIban1())) {
             TBankDetail bankDetail1 = new TBankDetail();
             bankDetail1.setIBAN(form.getIban1());
@@ -208,7 +216,7 @@ public final class Util {
             bankDetail3.setType(new BigInteger(form.getType3().toString()));
             bankDetails.getBankDetail().add(bankDetail3);
         }
-        tCustomer.setBankDetails(bankDetails);
+        */
 
         var contact = new TCustomer.Contact();
         var hhh = new TContact.Phone();
@@ -285,6 +293,22 @@ public final class Util {
         tbodyRequest.setNewAccount(tnewAccountRequest);
 
         return tbodyRequest;
+    }
+
+    private static TBankDetail getBankDetail(String mfo, String iban, String card, String bank, String currency,
+                                             String bic, String lei, boolean use4Income, Integer type) {
+        TBankDetail bankDetail = new TBankDetail();
+        bankDetail.setMFO(mfo);
+        bankDetail.setIBAN(iban);
+        bankDetail.setCardAccount(card);
+        bankDetail.setBankName(bank);
+        bankDetail.setCurrency(currency);
+        bankDetail.setBIC(bic);
+        bankDetail.setLEI(lei);
+        bankDetail.setUse4Income(use4Income);
+        bankDetail.setType(new BigInteger(type.toString()));
+
+        return bankDetail;
     }
 
 
