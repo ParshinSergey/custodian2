@@ -43,7 +43,7 @@ public final class Util {
     }
 
 
-    static THeaderRequest getHeaderRequest(String number) {
+    static THeaderRequest getHeaderRequestTest(String number) {
         int end = Integer.parseInt(number);
         int res = 1_000_000_000 + end;
         THeaderRequest header = new THeaderRequest();
@@ -54,13 +54,23 @@ public final class Util {
     }
 
 
-    static THeaderRequest getHeaderRequest() {
+    static THeaderRequest getHeaderRequestTest() {
         THeaderRequest header = new THeaderRequest();
         header.setRequestID(UUID.randomUUID().toString());
         header.setTimeStamp(xmlGregorianCalendar( LocalDateTime.now()));
         header.setSourceAPPidentity("1DD4EC32-45DB-404A-A123-6F657895E502");
         return header;
     }
+
+    static THeaderRequest getHeaderRequest() {
+        THeaderRequest header = new THeaderRequest();
+        header.setRequestID(UUID.randomUUID().toString());
+        header.setTimeStamp(xmlGregorianCalendar( LocalDateTime.now()));
+        header.setSourceAPPidentity("3000350A-429D-4632-81B7-B31C02C7D980");
+        return header;
+    }
+
+
 
     static TbodyRequest convertFormToNewAccount(FormFO form){
         TCustomer tCustomer = new TCustomer();

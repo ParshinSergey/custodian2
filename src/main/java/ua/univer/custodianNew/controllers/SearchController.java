@@ -4,8 +4,6 @@ import dmt.custodian2016.Request;
 import dmt.custodian2016.THeaderRequest;
 import dmt.custodian2016.TbodyRequest;
 import jakarta.xml.bind.Marshaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +29,7 @@ public class SearchController extends BaseController{
         logger.info("Method SearchAccountV2.");
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
         tHeaderRequest.setRequestType("SearchAccountV2");
         request.setHeader(tHeaderRequest);
 
@@ -50,7 +48,7 @@ public class SearchController extends BaseController{
         logger.info("Method SearchAccount.");
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
         tHeaderRequest.setRequestType("SearchAccount");
         request.setHeader(tHeaderRequest);
 

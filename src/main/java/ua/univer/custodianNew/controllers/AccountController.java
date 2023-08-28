@@ -34,7 +34,7 @@ public class AccountController extends BaseController {
 
     @PostMapping (value = "/" + NEW_ACCOUNT)
     public ResponseEntity<Request> getNewAccount (@RequestBody Request request) {
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest("12345");
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest("12345");
         tHeaderRequest.setRequestType(NEW_ACCOUNT);
         request.setHeader(tHeaderRequest);
 
@@ -46,7 +46,7 @@ public class AccountController extends BaseController {
 
     @PostMapping (value = "/" + NEW_ACCOUNT + "UO")
     public ResponseEntity<String> getNewAccountUO (@RequestBody Request request) {
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest("12345");
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest("12345");
         tHeaderRequest.setRequestType(NEW_ACCOUNT);
         request.setHeader(tHeaderRequest);
 
@@ -85,7 +85,7 @@ public class AccountController extends BaseController {
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.getRequestID());
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest(form.getRequestID());
         tHeaderRequest.setRequestType(NEW_ACCOUNT);
         request.setHeader(tHeaderRequest);
 
@@ -131,7 +131,7 @@ public class AccountController extends BaseController {
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.getRequestID());
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest(form.getRequestID());
         tHeaderRequest.setRequestType(NEW_ACCOUNT);
         request.setHeader(tHeaderRequest);
 
@@ -170,7 +170,7 @@ public class AccountController extends BaseController {
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
         tHeaderRequest.setRequestType("GetAccountNum");
         request.setHeader(tHeaderRequest);
 
@@ -228,7 +228,7 @@ public class AccountController extends BaseController {
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
         tHeaderRequest.setRequestType("AccountNumReserveCancel");
         request.setHeader(tHeaderRequest);
 
