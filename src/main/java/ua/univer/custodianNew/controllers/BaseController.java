@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
+import ua.univer.custodianNew.util.ConverterUtil;
 
 import java.io.*;
 import java.net.URI;
@@ -21,8 +23,9 @@ import java.nio.file.Files;
 public class BaseController {
 
     //public static final String DECKRA_URL = "https://10.1.2.80/API_BP/cp_api.dll";
-    public static final String DECKRA_URL = "https://localhost/API_BP/cp_api.dll";
-    public static final String DECKRA_URL_TEST = "http://localhost:8081/api/service/result";
+    public static final String DECKRA_URL_80 = "https://localhost/API_BP/cp_api.dll";
+    public static final String DECKRA_URL_PROD = "https://10.1.2.204/API_BP/cp_api.dll";
+    public static final String DECKRA_URL_FAKE = "http://localhost:8081/api/service/result";
 
     Logger logger = LoggerFactory.getLogger(BaseController.class);
 
@@ -77,7 +80,7 @@ public class BaseController {
         Files.writeString(file.toPath(), writer.toString());
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(DECKRA_URL))
+                .uri(URI.create(DECKRA_URL_80))
                 .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
                 .header("Content-Type", "application/xml")
                 .build();
@@ -119,6 +122,25 @@ public class BaseController {
             reader.close();
         }
         return responce;
+    }
+
+
+    protected ResponseEntity<String> getResponseEntity(long time, Request request, String methodName) throws IOException {
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, methodName);
+        Responce responce = getResponceFromXml(deckraResponse);
+        String jsonResponse = ConverterUtil.objectToJson(responce);
+
+        if (responce == null) {
+            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
+        } else {
+            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())) {
+                String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
+                return ResponseEntity.badRequest().body(answer);
+            } else {
+                logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
+                return ResponseEntity.ok().body(jsonResponse);
+            }
+        }
     }
 
 

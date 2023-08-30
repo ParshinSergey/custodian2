@@ -53,23 +53,7 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "Balance");
-        Responce responce = getResponceFromXml(deckraResponse);
-        String jsonResponse = ConverterUtil.objectToJson(responce);
-
-        if (responce == null) {
-            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
-        } else {
-            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())){
-                String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
-                return ResponseEntity.badRequest().body(answer);
-            }
-            else {
-                //String answer = answer(responce);
-                logger.info("time is " + (System.nanoTime() - time)/1000000 + " ms");
-                return ResponseEntity.ok().body(jsonResponse);
-            }
-        }
+        return getResponseEntity(time, request, "Balance");
     }
 
     @PostMapping(value = "/accountV2")
@@ -99,23 +83,7 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "Statement");
-        Responce responce = getResponceFromXml(deckraResponse);
-        String jsonResponse = ConverterUtil.objectToJson(responce);
-
-        if (responce == null) {
-            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
-        } else {
-            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())){
-                String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
-                return ResponseEntity.badRequest().body(answer);
-            }
-            else {
-                //String answer = answer(responce);
-                logger.info("time is " + (System.nanoTime() - time)/1000000 + " ms");
-                return ResponseEntity.ok().body(jsonResponse);
-            }
-        }
+        return getResponseEntity(time, request, "Statement");
     }
 
     @PostMapping(value = "/transactionV2")
@@ -152,25 +120,71 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "Transaction");
+        return getResponseEntity(time, request, "Transaction");
+
+    }
+
+    @PostMapping(value = "/TEST/transactionPDF")
+    public ResponseEntity<String> transactionPDF(@RequestBody @Valid FormTransaction form, BindingResult result) throws IOException {
+
+        logger.info("Statement_of_Transaction TEST.");
+        if (result.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
+            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
+        }
+        long time = System.nanoTime();
+
+        Request request = new Request();
+
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
+        tHeaderRequest.setRequestType("Statement_of_Transaction");
+        var binary = new THeaderRequest.Binary();
+        binary.setBinary(true);
+        binary.setTemplate(5);
+        binary.setOutputFormat(0);
+        tHeaderRequest.setBinary(binary);
+        request.setHeader(tHeaderRequest);
+
+        TStatementOfTransactionsRequest transaction = new TStatementOfTransactionsRequest();
+
+        transaction.setAccount(form.getAccount());
+        if (form.getIsin() != null) {
+            var tisin = new TISIN();
+            tisin.setISIN(form.getIsin());
+            tisin.setDepositary(form.getDepositary());
+            transaction.setISIN(tisin);
+        }
+        transaction.setDateStart(DateTimeUtil.oneBoxCalendar(form.getDateStart()));
+        transaction.setDateStop(DateTimeUtil.oneBoxCalendar(form.getDateStop()));
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setStatementOfTransactionsRequest(transaction);
+
+        request.setBody(tbodyRequest);
+
+        return getResponseEntity(time, request, "TransactionPDF");
+
+    }
+
+
+    /*private ResponseEntity<String> getResponseEntity(long time, Request request, String methodName) throws IOException {
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, methodName);
         Responce responce = getResponceFromXml(deckraResponse);
         String jsonResponse = ConverterUtil.objectToJson(responce);
 
         if (responce == null) {
             return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
         } else {
-            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())){
+            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())) {
                 String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
                 return ResponseEntity.badRequest().body(answer);
-            }
-            else {
-                logger.info("time is " + (System.nanoTime() - time)/1000000 + " ms");
+            } else {
+                logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
                 return ResponseEntity.ok().body(jsonResponse);
             }
         }
-
-    }
-
+    }*/
 
 
     private static String answer(Responce responce) {
