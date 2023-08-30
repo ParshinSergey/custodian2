@@ -25,8 +25,9 @@ public final class Util {
                 <cust:responce xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cust="urn:dmt:custodian2016"><cust:header><cust:ResponceType>newAccount</cust:ResponceType><cust:ResponceID>E1DFEE6F-F23B-47F0-98CE-4E29377C1300</cust:ResponceID><cust:TimeStamp>2023-07-05T15:42:24.017</cust:TimeStamp><cust:RequestID>AA0966B1-2E36-4242-85F1-BF1000059158</cust:RequestID><cust:binary><cust:binary>0</cust:binary><cust:outputFormat>0</cust:outputFormat></cust:binary></cust:header><cust:body><cust:account><cust:nssmcClientTypeCode>110</cust:nssmcClientTypeCode><cust:Customer><cust:Account>401836-UA10700082</cust:Account><cust:CustomerID>105633</cust:CustomerID><cust:CNUM>59158</cust:CNUM><cust:country>804</cust:country><cust:CountryTax>804</cust:CountryTax><cust:idCode>3362315014</cust:idCode><cust:ClientTypeCode>0</cust:ClientTypeCode><cust:name><cust:shortName>Шкурко В'ячеслав Миколайович</cust:shortName><cust:longName>Шкурко В'ячеслав Миколайович</cust:longName></cust:name><cust:addresses><cust:address><cust:addressID>-1</cust:addressID><cust:addressType>legal</cust:addressType><cust:country>804</cust:country><cust:addressFree>90300, Україна, ЗАКАРПАТСЬКА ОБЛ., БЕРЕГІВСЬКИЙ Р-Н, М.ВИНОГРАДІВ, ВУЛ. ТЮЛЬПАНІВ, БУД.1</cust:addressFree></cust:address></cust:addresses><cust:docFO><cust:docSerial/><cust:docNumber>007481641</cust:docNumber><cust:docDate>2022-02-02</cust:docDate><cust:docWho>2114</cust:docWho><cust:docType>Паспорт громадянина України з безконтактним електронним носієм</cust:docType><cust:docDatestart>2022-02-02</cust:docDatestart><cust:docDateStop>2032-02-02</cust:docDateStop><cust:docSDRnumber>19920121-10811</cust:docSDRnumber></cust:docFO><cust:bankDetails><cust:bankDetail><cust:IBAN>UA173052990000026203730586229</cust:IBAN><cust:currency>840</cust:currency><cust:bankDetailID>13608</cust:bankDetailID><cust:use4income>false</cust:use4income><cust:Period><cust:DateStart>2023-07-05</cust:DateStart></cust:Period><cust:Type>1</cust:Type></cust:bankDetail><cust:bankDetail><cust:IBAN>UA343052990000026205678832572</cust:IBAN><cust:currency>980</cust:currency><cust:bankDetailID>13607</cust:bankDetailID><cust:use4income>false</cust:use4income><cust:Period><cust:DateStart>2023-07-05</cust:DateStart></cust:Period><cust:Type>1</cust:Type></cust:bankDetail></cust:bankDetails><cust:addParams><cust:param><cust:Name>CNUM</cust:Name><cust:Value>59158</cust:Value></cust:param><cust:param><cust:Name>SDRnumber</cust:Name><cust:Value>19920121-10811</cust:Value></cust:param><cust:param><cust:Name>MainPhone</cust:Name><cust:Value>380678896093</cust:Value></cust:param><cust:param><cust:Name>MobilePhone</cust:Name><cust:Value>380678896093</cust:Value></cust:param><cust:param><cust:Name>EMail_Alter</cust:Name><cust:Value>slavian210192@gmail.com</cust:Value></cust:param></cust:addParams><cust:contact><cust:Phone>380678896093</cust:Phone><cust:mobilePhone>380678896093</cust:mobilePhone><cust:eMails><cust:eMail_general>slavian210192@gmail.com</cust:eMail_general></cust:eMails></cust:contact><cust:BirthInfo><cust:BirthDate>1992-01-21</cust:BirthDate><cust:BirthPlace>м. Белгород</cust:BirthPlace></cust:BirthInfo><cust:refusingCode>0</cust:refusingCode></cust:Customer><cust:agreements><cust:agreement><cust:number>105300</cust:number><cust:date>2023-06-15</cust:date><cust:dateStart>2023-06-15</cust:dateStart><cust:AgrID>10627</cust:AgrID></cust:agreement></cust:agreements><cust:brokerAgreements><cust:brokerAgreement><cust:number>БО-230615-0001</cust:number><cust:date>2023-06-15</cust:date><cust:dateStart>2023-06-15</cust:dateStart><cust:Customer><cust:CustomerID>87140</cust:CustomerID><cust:country>804</cust:country><cust:CountryTax>804</cust:CountryTax><cust:idCode>3451316470</cust:idCode><cust:ClientTypeCode>0</cust:ClientTypeCode><cust:name><cust:shortName>Халос Н. О.</cust:shortName><cust:longName>Халос Назар Олегович</cust:longName><cust:shortName_International/><cust:longName_International/></cust:name><cust:addresses><cust:address><cust:addressID>-1</cust:addressID><cust:addressType>legal</cust:addressType><cust:country>804</cust:country><cust:postIndex>82000</cust:postIndex><cust:region>46000</cust:region><cust:district>Старосамбірський р-н.</cust:district><cust:locality>місто Старий Самбір</cust:locality><cust:street>вул. Дністрова</cust:street><cust:house>87</cust:house><cust:flat>29</cust:flat></cust:address></cust:addresses><cust:docFO><cust:docSerial>КС</cust:docSerial><cust:docNumber>787651</cust:docNumber><cust:docDate>2010-11-10</cust:docDate><cust:docWho>Старосамбірським РВ ГУМВС України у Львівській обл.</cust:docWho><cust:docType>Паспорт</cust:docType><cust:docDatestart>2019-07-04</cust:docDatestart><cust:docDateStop>1899-12-30</cust:docDateStop></cust:docFO><cust:contact/><cust:BirthInfo><cust:BirthPlace>село Ралівка, Самбірського району, Львівської області</cust:BirthPlace></cust:BirthInfo><cust:refusingCode>0</cust:refusingCode><cust:Form/></cust:Customer></cust:brokerAgreement></cust:brokerAgreements><cust:Controlling/><cust:accountNumber>401836-UA10700082</cust:accountNumber><cust:State>0</cust:State><cust:Status>1</cust:Status><cust:accountDateopen>2023-07-05</cust:accountDateopen><cust:Level><cust:NDU>2</cust:NDU><cust:NBU>2</cust:NBU></cust:Level><cust:NBU><cust:BaseAggregated_id>5</cust:BaseAggregated_id></cust:NBU><cust:AccountID>9626</cust:AccountID></cust:account></cust:body></cust:responce>
                 """;
 
-    private static String sourceAPP_prod = "E0D397FA-146D-434B-89E0-EA9FF9CDCBC5";
-    private static String sourceAPP_test = "1DD4EC32-45DB-404A-A123-6F657895E502";
+    private static final String sourceAPP_prod = "E0D397FA-146D-434B-89E0-EA9FF9CDCBC5";
+    private static final String sourceAPP_test = "1DD4EC32-45DB-404A-A123-6F657895E502";
+    private static final String sourceAPP_80 = "3000350A-429D-4632-81B7-B31C02C7D980";
 
 
     private Util() {
@@ -52,7 +53,7 @@ public final class Util {
         THeaderRequest header = new THeaderRequest();
         header.setRequestID("AA0966B1-2E36-4242-85F1-BF" + res);
         header.setTimeStamp(xmlGregorianCalendar( LocalDateTime.now()));
-        header.setSourceAPPidentity("1DD4EC32-45DB-404A-A123-6F657895E502");
+        header.setSourceAPPidentity(sourceAPP_test);
         return header;
     }
 
@@ -61,7 +62,7 @@ public final class Util {
         THeaderRequest header = new THeaderRequest();
         header.setRequestID(UUID.randomUUID().toString());
         header.setTimeStamp(xmlGregorianCalendar( LocalDateTime.now()));
-        header.setSourceAPPidentity("1DD4EC32-45DB-404A-A123-6F657895E502");
+        header.setSourceAPPidentity(sourceAPP_test);
         return header;
     }
 
@@ -71,7 +72,7 @@ public final class Util {
         THeaderRequest header = new THeaderRequest();
         header.setRequestID("AA0966B1-2E36-4242-85F1-BF" + res);
         header.setTimeStamp(xmlGregorianCalendar( LocalDateTime.now()));
-        header.setSourceAPPidentity("3000350A-429D-4632-81B7-B31C02C7D980");
+        header.setSourceAPPidentity(sourceAPP_prod);
         return header;
     }
 
@@ -79,7 +80,7 @@ public final class Util {
         THeaderRequest header = new THeaderRequest();
         header.setRequestID(UUID.randomUUID().toString());
         header.setTimeStamp(xmlGregorianCalendar( LocalDateTime.now()));
-        header.setSourceAPPidentity("3000350A-429D-4632-81B7-B31C02C7D980");
+        header.setSourceAPPidentity(sourceAPP_prod);
         return header;
     }
 

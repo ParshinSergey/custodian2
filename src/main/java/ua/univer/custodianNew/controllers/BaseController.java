@@ -80,7 +80,7 @@ public class BaseController {
         Files.writeString(file.toPath(), writer.toString());
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(DECKRA_URL_80))
+                .uri(URI.create(DECKRA_URL_PROD))
                 .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
                 .header("Content-Type", "application/xml")
                 .build();
