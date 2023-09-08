@@ -23,7 +23,7 @@ import java.nio.file.Files;
 public class BaseController {
 
     //public static final String DECKRA_URL = "https://10.1.2.80/API_BP/cp_api.dll";
-    public static final String DECKRA_URL_80 = "https://localhost/API_BP/cp_api.dll";
+    public static final String DECKRA_URL_80 = "https://10.1.2.80/API_BP/cp_api.dll";
     public static final String DECKRA_URL_PROD = "https://10.1.2.204/API_BP/cp_api.dll";
     public static final String DECKRA_URL_FAKE = "http://localhost:8081/api/service/result";
 
@@ -72,7 +72,7 @@ public class BaseController {
         }
     }
 
-    protected String writeAndSendRequestWriteResponseToFile(Request request, String prefix) throws IOException {
+    protected String writeAndSendRequestWriteResponseToFile(Request request, String ipAddress, String prefix) throws IOException {
 
         Writer writer = new StringWriter();
         saveXmlToWriter(request, writer);
@@ -80,7 +80,7 @@ public class BaseController {
         Files.writeString(file.toPath(), writer.toString());
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(DECKRA_URL_PROD))
+                .uri(URI.create(ipAddress))
                 .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
                 .header("Content-Type", "application/xml")
                 .build();
@@ -125,8 +125,8 @@ public class BaseController {
     }
 
 
-    protected ResponseEntity<String> getResponseEntity(long time, Request request, String methodName) throws IOException {
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, methodName);
+    protected ResponseEntity<String> getResponseEntity(long time, Request request, String ipAddress, String methodName) throws IOException {
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, ipAddress, methodName);
         Responce responce = getResponceFromXml(deckraResponse);
         String jsonResponse = ConverterUtil.objectToJson(responce);
 

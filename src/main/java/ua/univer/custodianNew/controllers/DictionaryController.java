@@ -1,9 +1,6 @@
 package ua.univer.custodianNew.controllers;
 
-import dmt.custodian2016.Request;
-import dmt.custodian2016.TDictionaryCustomRequest;
-import dmt.custodian2016.THeaderRequest;
-import dmt.custodian2016.TbodyRequest;
+import dmt.custodian2016.*;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +21,32 @@ public class DictionaryController extends BaseController {
     @GetMapping(value = "/get")
     public ResponseEntity<String> getDictionary (@RequestBody FormDictionary form) throws IOException {
 
+        logger.info("Method GetDictionary. Production");
+        long time = System.nanoTime();
+
+        Request request = new Request();
+
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
+        tHeaderRequest.setRequestType("GetDictionary");
+        request.setHeader(tHeaderRequest);
+
+        var dictionaryCustomRequest = new TDictionaryCustomRequest();
+        dictionaryCustomRequest.setCode(form.getCode());
+        dictionaryCustomRequest.setData(form.isData());
+        dictionaryCustomRequest.setMetadata(form.isMetadata());
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setDictionary(dictionaryCustomRequest);
+
+        request.setBody(tbodyRequest);
+
+        return getResponseEntity(time, request, DECKRA_URL_PROD, "GetDictionary");
+
+    }
+
+    @GetMapping(value = "/TEST/get")
+    public ResponseEntity<String> testGetDictionary (@RequestBody FormDictionary form) throws IOException {
+
         logger.info("Method GetDictionary.");
         long time = System.nanoTime();
 
@@ -43,7 +66,41 @@ public class DictionaryController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, "GetDictionary");
+        return getResponseEntity(time, request, DECKRA_URL_80, "GetDictionary");
 
     }
+
+    @GetMapping(value = "/TEST/getDictionaries")
+    public ResponseEntity<String> testGetDictionaries (@RequestBody FormDictionary form) throws IOException {
+
+        logger.info("Method GetDictionaries.");
+        long time = System.nanoTime();
+
+        Request request = new Request();
+
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
+        tHeaderRequest.setRequestType("GetDictionaries");
+        request.setHeader(tHeaderRequest);
+
+       /* var dictionaryCustomRequest = new TDictionaryCustomRequest();
+        dictionaryCustomRequest.setCode(form.getCode());
+        dictionaryCustomRequest.setData(form.isData());
+        dictionaryCustomRequest.setMetadata(form.isMetadata());
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setDictionary(dictionaryCustomRequest);*/
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        TDummy dummy = new TDummy();
+        tbodyRequest.setDictionaries(dummy);
+
+        request.setBody(tbodyRequest);
+
+        return getResponseEntity(time, request, DECKRA_URL_80, "GetDictionaries");
+
+    }
+
+
+
+
 }

@@ -31,48 +31,7 @@ public class AccountController extends BaseController {
         super(marshaller, httpClient);
     }
 
-
-    @PostMapping (value = "/" + NEW_ACCOUNT)
-    public ResponseEntity<Request> getNewAccount (@RequestBody Request request) {
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest("12345");
-        tHeaderRequest.setRequestType(NEW_ACCOUNT);
-        request.setHeader(tHeaderRequest);
-
-        File file = Util.getFile("request", ".xml");
-        saveToFileXml(request, file);
-
-        return ResponseEntity.ok().body(request);
-    }
-
-    @PostMapping (value = "/" + NEW_ACCOUNT + "UO")
-    public ResponseEntity<String> getNewAccountUO (@RequestBody Request request) {
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest("12345");
-        tHeaderRequest.setRequestType(NEW_ACCOUNT);
-        request.setHeader(tHeaderRequest);
-
-        Writer writer = new StringWriter();
-        saveXmlToWriter(request, writer);
-
-        // стремное место
-        // HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
-
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(DECKRA_URL_FAKE))
-                .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
-                .header("Content-Type", "application/xml")
-                .build();
-
-
-        HttpResponse<String> response;
-        try {
-            response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Deckra-service. Message - " + e.getMessage());
-        }
-
-        return ResponseEntity.ok().body(response.body());
-    }
-
+/*
 
     @PostMapping (value = "/" + NEW_ACCOUNT + "Test")
     public ResponseEntity<String> getNewAccountTest (@RequestBody @Valid FormFO form, BindingResult result) throws IOException {
@@ -117,6 +76,7 @@ public class AccountController extends BaseController {
         return ResponseEntity.ok().body(response.body());
     }
 
+*/
 
     @PostMapping(value = "/TEST/" + NEW_ACCOUNT + "FO")
     public ResponseEntity<String> testGetNewAccountFO (@RequestBody @Valid FormFO form, BindingResult result) throws IOException {
@@ -139,23 +99,7 @@ public class AccountController extends BaseController {
         TbodyRequest tbodyRequest = Util.convertFormToNewAccount(form);
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, "NewAccountTEST");
-
-        /*String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "NewAccount");
-        Responce responce = getResponceFromXml(deckraResponse);
-        String jsonResponse = ConverterUtil.objectToJson(responce);
-
-        if (responce == null) {
-            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
-        } else {
-            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())){
-                String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
-                return ResponseEntity.badRequest().body(answer);
-            }
-            else {
-                return ResponseEntity.ok().body(jsonResponse);
-            }
-        }*/
+        return getResponseEntity(time, request, DECKRA_URL_80, "NewAccountTEST");
     }
 
 
@@ -180,9 +124,9 @@ public class AccountController extends BaseController {
         TbodyRequest tbodyRequest = Util.convertFormToNewAccount(form);
         request.setBody(tbodyRequest);
 
-        // return getResponseEntity(time, request, "NewAccount");
+        return getResponseEntity(time, request, DECKRA_URL_PROD, "NewAccount");
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "NewAccount");
+     /*   String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "NewAccount");
         Responce responce = getResponceFromXml(deckraResponse);
         String jsonResponse = ConverterUtil.objectToJson(responce);
 
@@ -197,10 +141,8 @@ public class AccountController extends BaseController {
                 logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
                 return ResponseEntity.ok().body(jsonResponse);
             }
-        }
+        }*/
     }
-
-
 
 
 
@@ -247,7 +189,7 @@ public class AccountController extends BaseController {
         tbodyRequest.setAccountNum(accountNumRequest);
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "GetAccountTEST");
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_80, "GetAccountTEST");
 
         Responce responce = getResponceFromXml(deckraResponse);
 
@@ -313,7 +255,7 @@ public class AccountController extends BaseController {
         tbodyRequest.setAccountNum(accountNumRequest);
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "GetAccount");
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_PROD, "GetAccount");
 
         Responce responce = getResponceFromXml(deckraResponse);
 
@@ -353,7 +295,7 @@ public class AccountController extends BaseController {
         tbodyRequest.setAccountNumReserveCancel(form.getAccount());
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, "ReserveCancel");
+        return getResponseEntity(time, request, DECKRA_URL_PROD, "ReserveCancel");
     }
 
 }

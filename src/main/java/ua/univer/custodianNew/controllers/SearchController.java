@@ -23,7 +23,7 @@ public class SearchController extends BaseController{
     }
 
 
-    @GetMapping(value = "/accountV2")
+    @GetMapping(value = "/TEST/accountV2")
     public ResponseEntity<String> searchAccountV2 (@RequestBody FormSearch form) throws IOException {
 
         logger.info("Method SearchAccountV2.");
@@ -36,13 +36,13 @@ public class SearchController extends BaseController{
         TbodyRequest tbodyRequest = Util.convertFormToSearchAccountV2(form);
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "SearchAccV2");
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_80, "SearchAccV2");
 
         return ResponseEntity.ok().body(deckraResponse);
     }
 
 
-    @GetMapping(value = "/account")
+    @GetMapping(value = "/TEST/account")
     public ResponseEntity<String> searchAccount (@RequestBody FormSearch form) throws IOException {
 
         logger.info("Method SearchAccount.");
@@ -55,7 +55,7 @@ public class SearchController extends BaseController{
         TbodyRequest tbodyRequest = Util.convertFormToSearchAccount(form);
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "SearchAcc");
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_80, "SearchAcc");
 
         return ResponseEntity.ok().body(deckraResponse);
     }

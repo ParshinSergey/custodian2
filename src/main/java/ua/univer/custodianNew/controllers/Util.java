@@ -212,36 +212,6 @@ public final class Util {
         tCustomer.setBankDetails(bankDetails);
 
 
-/*
-        if (form.getType1() != null && StringUtils.hasLength(form.getIban1())) {
-            TBankDetail bankDetail1 = new TBankDetail();
-            bankDetail1.setIBAN(form.getIban1());
-            bankDetail1.setCurrency(form.getCurrency1());
-            if (form.isUse4Income1()) {
-                bankDetail1.setUse4Income(form.isUse4Income1());}
-            bankDetail1.setType(new BigInteger(form.getType1().toString()));
-            bankDetails.getBankDetail().add(bankDetail1);
-        }
-        if (form.getType2() != null && StringUtils.hasLength(form.getIban2())) {
-            TBankDetail bankDetail2 = new TBankDetail();
-            bankDetail2.setIBAN(form.getIban2());
-            bankDetail2.setCurrency(form.getCurrency2());
-            if (form.isUse4Income2()) {
-                bankDetail2.setUse4Income(form.isUse4Income2());}
-            bankDetail2.setType(new BigInteger(form.getType2().toString()));
-            bankDetails.getBankDetail().add(bankDetail2);
-        }
-        if (form.getType3() != null && StringUtils.hasLength(form.getIban3())) {
-            TBankDetail bankDetail3 = new TBankDetail();
-            bankDetail3.setIBAN(form.getIban3());
-            bankDetail3.setCurrency(form.getCurrency3());
-            if (form.isUse4Income3()) {
-                bankDetail3.setUse4Income(form.isUse4Income3());}
-            bankDetail3.setType(new BigInteger(form.getType3().toString()));
-            bankDetails.getBankDetail().add(bankDetail3);
-        }
-        */
-
         var contact = new TCustomer.Contact();
         var hhh = new TContact.Phone();
         hhh.setValue(form.getPhone());

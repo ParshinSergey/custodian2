@@ -8,8 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ua.univer.custodianNew.dto.FormBalance;
 import ua.univer.custodianNew.dto.FormSearch;
 import ua.univer.custodianNew.dto.FormTransaction;
+import ua.univer.custodianNew.dto.FormTransactionFile;
 import ua.univer.custodianNew.util.ConverterUtil;
 import ua.univer.custodianNew.util.DateTimeUtil;
 
@@ -26,8 +28,8 @@ public class BalanceController extends BaseController {
         super(marshaller, httpClient);
     }
 
-    @PostMapping(value = "/account")
-    public ResponseEntity<String> balanceAccount(@RequestBody FormSearch form) throws IOException {
+    @PostMapping(value = "/TEST/account")
+    public ResponseEntity<String> balanceAccount(@RequestBody FormBalance form) throws IOException {
 
         logger.info("Method BalanceV2.");
         long time = System.nanoTime();
@@ -53,11 +55,11 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, "Balance");
+        return getResponseEntity(time, request, DECKRA_URL_80,"Balance");
     }
 
     @PostMapping(value = "/accountV2")
-    public ResponseEntity<String> balanceAccV2(@RequestBody FormSearch form) throws IOException {
+    public ResponseEntity<String> balanceAccV2(@RequestBody FormBalance form) throws IOException {
 
         logger.info("Statement_of_HoldingsV2. Production");
         long time = System.nanoTime();
@@ -83,10 +85,10 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, "Statement");
+        return getResponseEntity(time, request, DECKRA_URL_PROD, "Statement");
     }
 
-    @PostMapping(value = "/transactionV2")
+    @PostMapping(value = "/TEST/transactionV2")
     public ResponseEntity<String> transactionV2(@RequestBody @Valid FormTransaction form, BindingResult result) throws IOException {
 
         logger.info("Statement_of_TransactionV2.");
@@ -120,14 +122,14 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, "Transaction");
+        return getResponseEntity(time, request, DECKRA_URL_80, "Transaction");
 
     }
 
-    @PostMapping(value = "/TEST/transactionPDF")
-    public ResponseEntity<String> transactionPDF(@RequestBody @Valid FormTransaction form, BindingResult result) throws IOException {
+    @PostMapping(value = "/transactionFile")
+    public ResponseEntity<String> transactionFile(@RequestBody @Valid FormTransactionFile form, BindingResult result) throws IOException {
 
-        logger.info("Statement_of_Transaction TEST.");
+        logger.info("Statement_of_Transaction. File. Production");
         if (result.hasErrors()){
             StringBuilder sb = new StringBuilder();
             result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
@@ -137,12 +139,15 @@ public class BalanceController extends BaseController {
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
         tHeaderRequest.setRequestType("Statement_of_Transaction");
+
+        // tHeaderRequest.setSourceAPPidentity("3000350A-429D-4632-81B7-B31C02C7D980");
+
         var binary = new THeaderRequest.Binary();
         binary.setBinary(true);
-        binary.setTemplate(5);
-        binary.setOutputFormat(0);
+        binary.setTemplate(191);
+        binary.setOutputFormat(form.getOutputFormat().compareTo(-1) == 0 ? 0 : form.getOutputFormat());
         tHeaderRequest.setBinary(binary);
         request.setHeader(tHeaderRequest);
 
@@ -163,28 +168,53 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, "TransactionPDF");
+        return getResponseEntity(time, request, DECKRA_URL_PROD, "TransactionFile");
 
     }
 
+    @PostMapping(value = "/TEST/transactionFile")
+    public ResponseEntity<String> testTransactionFile(@RequestBody @Valid FormTransactionFile form, BindingResult result) throws IOException {
 
-    /*private ResponseEntity<String> getResponseEntity(long time, Request request, String methodName) throws IOException {
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, methodName);
-        Responce responce = getResponceFromXml(deckraResponse);
-        String jsonResponse = ConverterUtil.objectToJson(responce);
-
-        if (responce == null) {
-            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
-        } else {
-            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())) {
-                String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
-                return ResponseEntity.badRequest().body(answer);
-            } else {
-                logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
-                return ResponseEntity.ok().body(jsonResponse);
-            }
+        logger.info("Statement_of_Transaction. File. TEST.");
+        if (result.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
+            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
         }
-    }*/
+        long time = System.nanoTime();
+
+        Request request = new Request();
+
+        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
+        tHeaderRequest.setRequestType("Statement_of_Transaction");
+        var binary = new THeaderRequest.Binary();
+        binary.setBinary(true);
+        binary.setTemplate(191);
+        binary.setOutputFormat(form.getOutputFormat().compareTo(-1) == 0 ? 0 : form.getOutputFormat());
+        tHeaderRequest.setBinary(binary);
+        request.setHeader(tHeaderRequest);
+
+        TStatementOfTransactionsRequest transaction = new TStatementOfTransactionsRequest();
+
+        transaction.setAccount(form.getAccount());
+        if (form.getIsin() != null) {
+            var tisin = new TISIN();
+            tisin.setISIN(form.getIsin());
+            tisin.setDepositary(form.getDepositary());
+            transaction.setISIN(tisin);
+        }
+        transaction.setDateStart(DateTimeUtil.oneBoxCalendar(form.getDateStart()));
+        transaction.setDateStop(DateTimeUtil.oneBoxCalendar(form.getDateStop()));
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setStatementOfTransactionsRequest(transaction);
+
+        request.setBody(tbodyRequest);
+
+        return getResponseEntity(time, request, DECKRA_URL_80, "TransactionFile");
+
+    }
+
 
 
     private static String answer(Responce responce) {
