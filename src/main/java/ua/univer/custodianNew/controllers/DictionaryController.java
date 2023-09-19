@@ -82,17 +82,10 @@ public class DictionaryController extends BaseController {
         tHeaderRequest.setRequestType("GetDictionaries");
         request.setHeader(tHeaderRequest);
 
-       /* var dictionaryCustomRequest = new TDictionaryCustomRequest();
-        dictionaryCustomRequest.setCode(form.getCode());
-        dictionaryCustomRequest.setData(form.isData());
-        dictionaryCustomRequest.setMetadata(form.isMetadata());
 
         TbodyRequest tbodyRequest = new TbodyRequest();
-        tbodyRequest.setDictionary(dictionaryCustomRequest);*/
-
-        TbodyRequest tbodyRequest = new TbodyRequest();
-        TDummy dummy = new TDummy();
-        tbodyRequest.setDictionaries(dummy);
+       // TDummy dummy = new TDummy();
+        tbodyRequest.setDictionaries(null);
 
         request.setBody(tbodyRequest);
 

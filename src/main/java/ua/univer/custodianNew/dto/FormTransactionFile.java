@@ -10,16 +10,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FormTransactionFile {
+public class FormTransactionFile extends FormTransaction{
 
-    @NotBlank
+   /* @NotBlank
     private String dateStart;
     @NotBlank
     private String dateStop;
     @NotBlank
     private String account;
     private String isin;
-    private String depositary;
+    private String depositary;*/
     @NotNull
     private Integer outputFormat;
 
