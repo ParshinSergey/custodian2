@@ -12,7 +12,7 @@ import java.util.WeakHashMap;
 import java.io.File;
 
 @Service
-public class FileDownloadUtil {
+public class FileDownloadService {
 
     public static WeakHashMap<Integer, File> fileStorage = new WeakHashMap<>();
     public static WeakHashMap<String, byte[]> byteArrStorage = new WeakHashMap<>();
@@ -50,9 +50,13 @@ public class FileDownloadUtil {
         return null;
     }
 
-    public byte[] getByteArrFromStorage(String fileCode) throws IOException {
+    public byte[] getByteArrFromStorage(String fileName) {
 
-        return byteArrStorage.get(fileCode);
+        return byteArrStorage.get(fileName);
+    }
+
+    public void deleteFromStorage (String fileName){
+        byteArrStorage.remove(fileName);
     }
 
 

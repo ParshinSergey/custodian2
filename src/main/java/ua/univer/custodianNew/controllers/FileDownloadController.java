@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.univer.custodianNew.util.FileDownloadUtil;
+import ua.univer.custodianNew.util.FileDownloadService;
 
 import java.io.IOException;
 
@@ -19,21 +19,20 @@ public class FileDownloadController {
 
     Logger logger = LoggerFactory.getLogger(FileDownloadController.class);
 
-    private final FileDownloadUtil downloadUtil;
+    private final FileDownloadService downloadService;
 
-    public FileDownloadController(FileDownloadUtil downloadUtil) {
-        this.downloadUtil = downloadUtil;
+    public FileDownloadController(FileDownloadService downloadUtil) {
+        this.downloadService = downloadUtil;
     }
 
     @GetMapping("/downloadFile/{fileCode}")
     public ResponseEntity<?> downloadFile(@PathVariable("fileCode") String fileCode) {
 
         logger.info("Download file. FileCode = " + fileCode);
-        //FileDownloadUtil downloadUtil = new FileDownloadUtil();
 
         Resource resource = null;
         try {
-            resource = downloadUtil.getFileFromStorage(Integer.valueOf(fileCode));
+            resource = downloadService.getFileFromStorage(Integer.valueOf(fileCode));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -55,24 +54,32 @@ public class FileDownloadController {
             value = "/showPDF/{fileName}",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
-    public @ResponseBody byte[] getPdfWithMediaType(@PathVariable("fileName") String fileName) throws IOException {
+    public @ResponseBody byte[] showPdfWithMediaType(@PathVariable("fileName") String fileName) {
         logger.info("Show PDF. FileCode = " + fileName);
 
-        return downloadUtil.getByteArrFromStorage(fileName);
+        return downloadService.getByteArrFromStorage(fileName);
     }
 
 
     @GetMapping(value = "/downloadPDF/{fileName}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<?> getFileViaByteArrayResource(@PathVariable("fileName") String fileName) throws IOException {
+    public ResponseEntity<?> getFileViaByteArrayResource(@PathVariable("fileName") String fileName) {
 
-        logger.info("Download file. FileName = " + fileName);
-        ByteArrayResource resource = new ByteArrayResource(downloadUtil.getByteArrFromStorage(fileName));
+        logger.info("Download PDF. FileName = " + fileName);
 
-        String contentType = "application/octet-stream";
+        byte[] byteArr = downloadService.getByteArrFromStorage(fileName);
+        if (byteArr == null){
+            logger.info("File not found. Method downloadPDF.");
+            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+        }
+
+        ByteArrayResource resource = new ByteArrayResource(byteArr);
+        logger.info("Content Length = " + resource.contentLength());
         String headerValue = "attachment; filename=\"" + fileName + "\"";
 
+        downloadService.deleteFromStorage(fileName);
+        logger.info("Delete from Storage fileName = " + fileName);
+
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
                 .body(resource);
     }
