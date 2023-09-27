@@ -11,12 +11,55 @@ import lombok.Setter;
 public class FormTransaction {
 
     @NotBlank
-    private String dateStart;
-    @NotBlank
-    private String dateStop;
-    @NotBlank
-    private String account;
     private String isin;
     private String depositary;
+    private long quantity;
+
+    @NotBlank
+    private String number;
+    @NotBlank
+    private String date;
+    private double agreementCost;
+    private String agreementCurrency;
+    private Integer agreementType;
+    private String agreementTypeName;
+/*
+    private String transactionProcessing;
+    private boolean commitAfterRegistr;
+    // private String statementInResponse;
+    private boolean requestInResponse;
+*/
+
+    private String mdo;
+    @NotBlank
+    private String account;
+    private String name;
+    private String idCode;
+    private String docSerial;
+    private String docNumber;
+    private String docDate;
+    private String docWho;
+    private Integer level;
+    private Integer accountType;
+    private String brokerIdCode;
+    private String brokerName;
+    private String agregateAccountID;
+
+    private String mdo2;
+    @NotBlank
+    private String account2;
+    private String name2;
+    private String idCode2;
+    private String docSerial2;
+    private String docNumber2;
+    private String docDate2;
+    private String docWho2;
+    private Integer level2;
+    private Integer accountType2;
+    private String brokerIdCode2;
+    private String brokerName2;
+    private String agregateAccountID2;
+
+
 
 }

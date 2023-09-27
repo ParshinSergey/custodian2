@@ -2,18 +2,16 @@ package ua.univer.custodianNew.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-//@NoArgsConstructor
-public class FormTransactionPDF extends FormTransactionFile {
+public class FormStatementPDF extends FormStatementFile {
 
     @NotBlank
     private String orderId;
 
-    public FormTransactionPDF() {
+    public FormStatementPDF() {
         this.setOutputFormat(0);
     }
 }

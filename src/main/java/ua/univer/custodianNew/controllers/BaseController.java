@@ -2,6 +2,7 @@ package ua.univer.custodianNew.controllers;
 
 import dmt.custodian2016.Request;
 import dmt.custodian2016.Responce;
+import dmt.custodian2016.THeaderRequest;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
@@ -22,7 +23,6 @@ import java.nio.file.Files;
 
 public class BaseController {
 
-    //public static final String DECKRA_URL = "https://10.1.2.80/API_BP/cp_api.dll";
     public static final String DECKRA_URL_80 = "https://10.1.2.80/API_BP/cp_api.dll";
     public static final String DECKRA_URL_PROD = "https://10.1.2.204/API_BP/cp_api.dll";
     public static final String DECKRA_URL_FAKE = "http://localhost:8081/api/service/result";
@@ -37,6 +37,20 @@ public class BaseController {
     public BaseController(Marshaller marshaller, HttpClient httpClient) {
         this.marshaller = marshaller;
         this.httpClient = httpClient;
+    }
+
+
+    protected Request getRequestWithHeader(String methodName, boolean isTest) {
+
+        logger.info("\"Method %s. %s\"".formatted(methodName, isTest ? "TEST" : "Production"));
+
+        Request request = new Request();
+
+        THeaderRequest tHeaderRequest = isTest ? Util.getHeaderRequestTest() : Util.getHeaderRequest();
+        tHeaderRequest.setRequestType(methodName);
+        request.setHeader(tHeaderRequest);
+
+        return request;
     }
 
 
@@ -109,8 +123,35 @@ public class BaseController {
         return response;
     }
 
-    protected Responce getResponceFromXml(String deckraResponse) {
-        StringReader reader = new StringReader(deckraResponse);
+
+    protected String writeAndSendRequest(Request request, String ipAddress, String prefix) throws IOException {
+
+        Writer writer = new StringWriter();
+        saveXmlToWriter(request, writer);
+        File file = Util.getFile(prefix, ".xml");
+        Files.writeString(file.toPath(), writer.toString());
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(ipAddress))
+                .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
+                .header("Content-Type", "application/xml")
+                .build();
+        writer.close();
+
+        HttpResponse<String> httpResponse;
+        try {
+            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            logger.warn("Error connecting to Deckra-service");
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Deckra-service. Message - " + e.getMessage());
+        }
+
+        return httpResponse.body();
+    }
+
+
+    protected Responce getResponceFromXml(String dekraResponse) {
+        StringReader reader = new StringReader(dekraResponse);
 
         Responce responce = null;
         try {
@@ -126,12 +167,12 @@ public class BaseController {
 
 
     protected ResponseEntity<String> getResponseEntity(long time, Request request, String ipAddress, String methodName) throws IOException {
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, ipAddress, methodName);
-        Responce responce = getResponceFromXml(deckraResponse);
+        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, ipAddress, methodName);
+        Responce responce = getResponceFromXml(dekraResponse);
         String jsonResponse = ConverterUtil.objectToJson(responce);
 
         if (responce == null) {
-            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
+            return ResponseEntity.internalServerError().body("Произошла ошибка " + dekraResponse);
         } else {
             if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())) {
                 String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());

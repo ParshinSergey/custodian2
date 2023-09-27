@@ -1,8 +1,6 @@
 package ua.univer.custodianNew.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,18 +8,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FormTransactionFile extends FormTransaction{
+public class FormStatement {
 
-   /* @NotBlank
+    @NotBlank
     private String dateStart;
     @NotBlank
     private String dateStop;
     @NotBlank
     private String account;
     private String isin;
-    private String depositary;*/
-    @NotNull
-    private Integer outputFormat;
-
+    private String depositary;
 
 }

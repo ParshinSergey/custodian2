@@ -7,6 +7,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 import ua.univer.custodianNew.dto.FormFO;
 import ua.univer.custodianNew.dto.FormSearch;
+import ua.univer.custodianNew.dto.FormSearchAccount;
+import ua.univer.custodianNew.dto.FormSearchCustomer;
+
 import static ua.univer.custodianNew.util.DateTimeUtil.*;
 
 import java.io.File;
@@ -311,8 +314,8 @@ public final class Util {
         var searchAccountV2 = new TSearchAccountV2();
         searchAccountV2.setAccountNum(form.getAccount());
         searchAccountV2.setIDCode(form.getIdCode());
-        searchAccountV2.setState(form.getState());
-        searchAccountV2.setStatus(form.getStatus());
+        //searchAccountV2.setState(form.getState());
+        //searchAccountV2.setStatus(form.getStatus());
         searchAccountV2.setType(TResponceFilling.SIMPLE);
 
         if (form.getDocNumber() != null) {
@@ -328,11 +331,14 @@ public final class Util {
 
     }
 
-    public static TbodyRequest convertFormToSearchAccount(FormSearch form) {
+    public static TbodyRequest convertFormToSearchAccount(FormSearchAccount form) {
 
         var searchAccount = new TSearchAccount();
         searchAccount.setAccountNum(form.getAccount());
         searchAccount.setIDCode(form.getIdCode());
+        searchAccount.setName(form.getName());
+        searchAccount.setCNUM(form.getCnum());
+        searchAccount.setBoolOper(form.getBoolOper());
         if (form.getDocNumber() != null) {
             var document = new TSearchCustomer.DocFO();
             document.setDocSerial(form.getDocSerial());
@@ -344,6 +350,26 @@ public final class Util {
         tbodyRequest.setSearchAccount(searchAccount);
 
         return tbodyRequest;
+    }
+
+    public static TSearchCustomer convertFormToSearchCustomer(FormSearchCustomer form) {
+
+        var customer = new TSearchCustomer();
+        customer.setIDCode(form.getIdCode());
+        customer.setName(form.getName());
+        customer.setCNUM(form.getCnum());
+        customer.setBoolOper(form.getBoolOper());
+        if (form.getDocNumber() != null) {
+            var document = new TSearchCustomer.DocFO();
+            document.setDocSerial(form.getDocSerial());
+            document.setDocNumber(form.getDocNumber());
+            customer.setDocFO(document);
+        }
+
+       /* TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setSearchCustomer(customer);*/
+
+        return customer;
     }
 }
 

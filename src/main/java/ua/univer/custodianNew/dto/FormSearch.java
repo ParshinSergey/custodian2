@@ -11,7 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FormSearch {
 
-    @NotBlank
+    private String name;
+
     @Pattern(regexp = "^\\d{8}|\\d{10}$", message = "должно состоять из 8 или 10 цифр")
     private String idCode;
 
@@ -20,12 +21,12 @@ public class FormSearch {
 
     private String account;
 
-    private String state;
+    /*private String state;
     private String status;
-    private String type;
+    private String type;*/
 
-    private String isin;
+  /*  private String isin;
     private String depositary;
-    private String dateState;
+    private String dateState;*/
 
 }
