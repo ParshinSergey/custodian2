@@ -27,18 +27,20 @@ public class TransactionController extends BaseController{
         super(marshaller, httpClient);
     }
 
-    @Operation(summary = "Выполнение транзакции")
+    //@Operation(summary = "Выполнение транзакции")
     @PostMapping(value = "/TEST/transaction")
     public ResponseEntity<String> transaction(@RequestBody FormTransaction form) throws IOException {
 
-        logger.info("Method Transaction.");
+        long time = System.nanoTime();
+        Request request = getRequestWithHeader("Transaction", true);
+       /* logger.info("Method Transaction.");
         long time = System.nanoTime();
 
         Request request = new Request();
 
         THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
         tHeaderRequest.setRequestType("Transaction");
-        request.setHeader(tHeaderRequest);
+        request.setHeader(tHeaderRequest);*/
 
         TTransactionRequest transaction = new TTransactionRequest();
 

@@ -2,9 +2,7 @@ package ua.univer.custodianNew.controllers;
 
 
 import dmt.custodian2016.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
-import org.springframework.web.server.ResponseStatusException;
 import ua.univer.custodianNew.dto.FormFO;
 import ua.univer.custodianNew.dto.FormSearch;
 import ua.univer.custodianNew.dto.FormSearchAccount;
@@ -18,6 +16,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static ua.univer.custodianNew.config.AppConfiguration.DIRECTORY;
@@ -371,5 +370,73 @@ public final class Util {
 
         return customer;
     }
+
+
+    public static TCustomer makeCustomerForUpdate (TCustomer origin, FormFO updated){
+
+        TCustomer result = new TCustomer();
+
+        result.setAccount(updated.getAccount());
+        result.setCustomerID(origin.getCustomerID());
+
+        String updatedCnum = updated.getCnum();
+        if (updatedCnum != null && !updatedCnum.trim().equalsIgnoreCase(origin.getCNUM().getValue().trim())){
+            var cnum = new TCustomer.CNUM();
+            cnum.setValue(updatedCnum);
+            cnum.setChanged(true);
+            result.setCNUM(cnum);
+        }
+
+        String updatedCountry = updated.getCountry();
+        if (updatedCountry != null && !updatedCountry.trim().equalsIgnoreCase(origin.getCountry().getValue().trim())){
+            var country = new TCustomer.Country();
+            country.setValue(updatedCountry);
+            country.setChanged(true);
+            result.setCountry(country);
+        }
+
+        String updatedCountryTax = updated.getCountryTax();
+        if (updatedCountryTax != null && !updatedCountryTax.trim().equalsIgnoreCase(origin.getCountryTax().getValue().trim())){
+            var countryTax = new TCustomer.CountryTax();
+            countryTax.setValue(updatedCountryTax);
+            countryTax.setChanged(true);
+            result.setCountryTax(countryTax);
+        }
+
+        String updatedClientTypeCode = updated.getClientTypeCode();
+        if (updatedClientTypeCode != null && !updatedClientTypeCode.trim().equalsIgnoreCase(origin.getClientTypeCode().getValue().trim())){
+            var clientTypeCode = new TCustomer.ClientTypeCode();
+            clientTypeCode.setValue(updatedClientTypeCode);
+            clientTypeCode.setChanged(true);
+            result.setClientTypeCode(clientTypeCode);
+        }
+
+        String updatedShortName = updated.getShortName();
+        String updatedLongName = updated.getLongName();
+        if (updatedShortName != null && !updatedShortName.trim().equalsIgnoreCase(origin.getName().getShortName().getValue().trim())){
+            var name = new TName();
+            var shortName = new TName.ShortName();
+            shortName.setValue(updatedShortName);
+            shortName.setChanged(true);
+            name.setShortName(shortName);
+            var longName = new TName.LongName();
+            longName.setValue(updatedLongName);
+            longName.setChanged(true);
+            name.setLongName(longName);
+            result.setName(name);
+        }
+
+        List<Taddress> address = origin.getAddresses().getAddress();
+        for (Taddress taddress : address) {
+            if (taddress.getAddressType() == TAddressType.LEGAL){
+
+            }
+
+        }
+
+
+        return result;
+    }
+
 }
 

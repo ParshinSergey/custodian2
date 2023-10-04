@@ -1,6 +1,7 @@
 package ua.univer.custodianNew.controllers;
 
 import dmt.custodian2016.*;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.HttpStatus;
@@ -103,6 +104,7 @@ public class AccountController extends BaseController {
     }
 
 
+    @Operation(summary = "Відкриття рахунку")
     @PostMapping(value = "/" + NEW_ACCOUNT + "FO")
     public ResponseEntity<String> getNewAccountFO (@RequestBody @Valid FormFO form, BindingResult result) throws IOException {
 
@@ -126,22 +128,6 @@ public class AccountController extends BaseController {
 
         return getResponseEntity(time, request, DECKRA_URL_PROD, "NewAccount");
 
-     /*   String deckraResponse = writeAndSendRequestWriteResponseToFile(request, "NewAccount");
-        Responce responce = getResponceFromXml(deckraResponse);
-        String jsonResponse = ConverterUtil.objectToJson(responce);
-
-        if (responce == null) {
-            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
-        } else {
-            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())){
-                String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
-                return ResponseEntity.badRequest().body(answer);
-            }
-            else {
-                logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
-                return ResponseEntity.ok().body(jsonResponse);
-            }
-        }*/
     }
 
 
@@ -149,7 +135,6 @@ public class AccountController extends BaseController {
     @PostMapping(value = "/TEST/getAccount")
     public ResponseEntity<String> testGetAccount (@RequestBody @Valid FormGet form, BindingResult result) throws IOException {
 
-        logger.info("Method GetAccount TEST.");
         long time = System.nanoTime();
 
         if (result.hasErrors()) {
@@ -158,11 +143,7 @@ public class AccountController extends BaseController {
             return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
         }
 
-        Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
-        tHeaderRequest.setRequestType("GetAccountNum");
-        request.setHeader(tHeaderRequest);
+        Request request = getRequestWithHeader("GetAccountNum", true);
 
         TAccountNumRequest accountNumRequest = new TAccountNumRequest();
 
@@ -212,10 +193,11 @@ public class AccountController extends BaseController {
 
     }
 
+    @Operation(summary = "Запит номера рахунку")
     @PostMapping(value = "/getAccount")
     public ResponseEntity<String> getAccount (@RequestBody @Valid FormGet form, BindingResult result) throws IOException {
 
-        logger.info("Method GetAccount. Production");
+        //logger.info("Method GetAccount. Production");
         long time = System.nanoTime();
 
         if (result.hasErrors()) {
@@ -224,11 +206,13 @@ public class AccountController extends BaseController {
             return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
         }
 
-        Request request = new Request();
+        Request request = getRequestWithHeader("GetAccountNum", false);
+
+        /*Request request = new Request();
 
         THeaderRequest tHeaderRequest = Util.getHeaderRequest();
         tHeaderRequest.setRequestType("GetAccountNum");
-        request.setHeader(tHeaderRequest);
+        request.setHeader(tHeaderRequest);*/
 
         TAccountNumRequest accountNumRequest = new TAccountNumRequest();
 
@@ -279,17 +263,19 @@ public class AccountController extends BaseController {
 
 
 
+    @Operation(summary = "Скасування резервування номера рахунку")
     @PostMapping(value = "/accountReserveCancel")
     public ResponseEntity<String> accountReserveCancel (@RequestBody FormReserveCancel form) throws IOException {
 
-        logger.info("Method AccountNumReserveCancel. Production");
+        //logger.info("Method AccountNumReserveCancel. Production");
         long time = System.nanoTime();
+        Request request = getRequestWithHeader("AccountNumReserveCancel", false);
 
-        Request request = new Request();
+        /*Request request = new Request();
 
         THeaderRequest tHeaderRequest = Util.getHeaderRequest();
         tHeaderRequest.setRequestType("AccountNumReserveCancel");
-        request.setHeader(tHeaderRequest);
+        request.setHeader(tHeaderRequest);*/
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setAccountNumReserveCancel(form.getAccount());

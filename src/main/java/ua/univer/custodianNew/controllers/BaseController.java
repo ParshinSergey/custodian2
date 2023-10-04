@@ -42,7 +42,7 @@ public class BaseController {
 
     protected Request getRequestWithHeader(String methodName, boolean isTest) {
 
-        logger.info("\"Method %s. %s\"".formatted(methodName, isTest ? "TEST" : "Production"));
+        logger.info("Method %s. %s".formatted(methodName, isTest ? "TEST" : "Production"));
 
         Request request = new Request();
 
