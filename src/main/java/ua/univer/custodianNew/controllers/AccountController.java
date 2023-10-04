@@ -197,7 +197,6 @@ public class AccountController extends BaseController {
     @PostMapping(value = "/getAccount")
     public ResponseEntity<String> getAccount (@RequestBody @Valid FormGet form, BindingResult result) throws IOException {
 
-        //logger.info("Method GetAccount. Production");
         long time = System.nanoTime();
 
         if (result.hasErrors()) {
