@@ -117,6 +117,7 @@ public final class Util {
         if ("-1".equals(form.getClientTypeCode())){
             form.setClientTypeCode("0");
         }
+        //clientTypeCode.setValue("-1".equals(form.getClientTypeCode()) ? "0" : form.getClientTypeCode());
         clientTypeCode.setValue(form.getClientTypeCode());
         tCustomer.setClientTypeCode(clientTypeCode);
 
@@ -129,27 +130,6 @@ public final class Util {
         tName.setShortName(shortName);
         tCustomer.setName(tName);
 
-
-       /* var addresses = new TCustomer.Addresses();
-        Taddress address = new Taddress();
-        if(form.getAddressType() != null){
-        switch (form.getAddressType().toUpperCase().trim()){
-           case "LEGAL" ->  address.setAddressType(TAddressType.LEGAL);
-           case "POST" ->  address.setAddressType(TAddressType.POST);
-           case "OTHER" ->  address.setAddressType(TAddressType.OTHER);
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "addressType должно быть LEGAL|POST|OTHER");
-        }}
-        address.setCountry(form.getCountryAdr());
-        address.setPostIndex(form.getPostIndex());
-        address.setRegion(form.getRegion());
-        address.setDistrict(form.getDistrict());
-        address.setLocality(form.getLocality());
-        address.setStreet(form.getStreet());
-        address.setHouse(form.getHouse());
-        address.setFlat(form.getFlat());
-        address.setAddressFree(form.getAddressFree());
-        addresses.getAddress().add(address);
-        tCustomer.setAddresses(addresses);*/
 
 
         var addresses = new TCustomer.Addresses();
@@ -191,7 +171,7 @@ public final class Util {
 
 
         var bankDetails = new TCustomer.BankDetails();
-        if (form.getType() != null && StringUtils.hasLength(form.getIban())) {
+     /*   if (form.getType() != null && StringUtils.hasLength(form.getIban())) {
             TBankDetail bankDetail = getBankDetail(form.getMfo(), form.getIban(), form.getCardAccount(), form.getBankName(),
                     form.getCurrency(), form.getBic(), form.getLei(), form.isUse4Income(), form.getType());
             bankDetails.getBankDetail().add(bankDetail);
@@ -210,7 +190,15 @@ public final class Util {
             TBankDetail bankDetail3 = getBankDetail(form.getMfo3(), form.getIban3(), form.getCardAccount3(), form.getBankName3(),
                     form.getCurrency3(), form.getBic3(), form.getLei3(), form.isUse4Income3(), form.getType3());
             bankDetails.getBankDetail().add(bankDetail3);
-        }
+        }*/
+        addBankDetail(bankDetails, form.getMfo(), form.getIban(), form.getCardAccount(), form.getBankName(),
+                form.getCurrency(), form.getBic(), form.getLei(), form.isUse4Income(), form.getType());
+        addBankDetail(bankDetails, form.getMfo1(), form.getIban1(), form.getCardAccount1(), form.getBankName1(),
+                form.getCurrency1(), form.getBic1(), form.getLei1(), form.isUse4Income1(), form.getType1());
+        addBankDetail(bankDetails, form.getMfo2(), form.getIban2(), form.getCardAccount2(), form.getBankName2(),
+                form.getCurrency2(), form.getBic2(), form.getLei2(), form.isUse4Income2(), form.getType2());
+        addBankDetail(bankDetails, form.getMfo3(), form.getIban3(), form.getCardAccount3(), form.getBankName3(),
+                form.getCurrency3(), form.getBic3(), form.getLei3(), form.isUse4Income3(), form.getType3());
         tCustomer.setBankDetails(bankDetails);
 
 
@@ -308,6 +296,29 @@ public final class Util {
     }
 
 
+    private static void addBankDetail(TCustomer.BankDetails bankDetails, String mfo, String iban, String card, String bank, String currency, String bic, String lei, boolean use4Income, Integer type) {
+
+        if (type != null && StringUtils.hasLength(iban)) {
+
+            TBankDetail bankDetail = new TBankDetail();
+            bankDetail.setMFO(mfo);
+            bankDetail.setIBAN(iban);
+            bankDetail.setCardAccount(card);
+            bankDetail.setBankName(bank);
+            bankDetail.setCurrency(currency);
+            bankDetail.setBIC(bic);
+            bankDetail.setLEI(lei);
+            bankDetail.setUse4Income(use4Income);
+            bankDetail.setType(new BigInteger(type.toString()));
+
+            bankDetails.getBankDetail().add(bankDetail);
+        }
+    }
+
+
+
+
+
     public static TbodyRequest convertFormToSearchAccountV2(FormSearch form) {
 
         var searchAccountV2 = new TSearchAccountV2();
@@ -372,14 +383,14 @@ public final class Util {
     }
 
 
-    public static TCustomer makeCustomerForUpdate (TCustomer origin, FormFO updated){
+    public static TCustomer makeCustomerForUpdate (TCustomer origin, FormFO form){
 
         TCustomer result = new TCustomer();
 
-        result.setAccount(updated.getAccount());
+        result.setAccount(form.getAccount());
         result.setCustomerID(origin.getCustomerID());
 
-        String updatedCnum = updated.getCnum();
+        String updatedCnum = form.getCnum();
         if (updatedCnum != null && !updatedCnum.trim().equalsIgnoreCase(origin.getCNUM().getValue().trim())){
             var cnum = new TCustomer.CNUM();
             cnum.setValue(updatedCnum);
@@ -387,7 +398,7 @@ public final class Util {
             result.setCNUM(cnum);
         }
 
-        String updatedCountry = updated.getCountry();
+        String updatedCountry = form.getCountry();
         if (updatedCountry != null && !updatedCountry.trim().equalsIgnoreCase(origin.getCountry().getValue().trim())){
             var country = new TCustomer.Country();
             country.setValue(updatedCountry);
@@ -395,7 +406,7 @@ public final class Util {
             result.setCountry(country);
         }
 
-        String updatedCountryTax = updated.getCountryTax();
+        String updatedCountryTax = form.getCountryTax();
         if (updatedCountryTax != null && !updatedCountryTax.trim().equalsIgnoreCase(origin.getCountryTax().getValue().trim())){
             var countryTax = new TCustomer.CountryTax();
             countryTax.setValue(updatedCountryTax);
@@ -403,7 +414,8 @@ public final class Util {
             result.setCountryTax(countryTax);
         }
 
-        String updatedClientTypeCode = updated.getClientTypeCode();
+        // тут может быть понадобится обрабатывать 0.
+        String updatedClientTypeCode = form.getClientTypeCode();
         if (updatedClientTypeCode != null && !updatedClientTypeCode.trim().equalsIgnoreCase(origin.getClientTypeCode().getValue().trim())){
             var clientTypeCode = new TCustomer.ClientTypeCode();
             clientTypeCode.setValue(updatedClientTypeCode);
@@ -411,8 +423,8 @@ public final class Util {
             result.setClientTypeCode(clientTypeCode);
         }
 
-        String updatedShortName = updated.getShortName();
-        String updatedLongName = updated.getLongName();
+        String updatedShortName = form.getShortName();
+        String updatedLongName = form.getLongName();
         if (updatedShortName != null && !updatedShortName.trim().equalsIgnoreCase(origin.getName().getShortName().getValue().trim())){
             var name = new TName();
             var shortName = new TName.ShortName();
@@ -430,12 +442,67 @@ public final class Util {
         for (Taddress taddress : address) {
             if (taddress.getAddressType() == TAddressType.LEGAL){
 
-            }
+           /*     String phrase = "фактична адреса згідно довідки ВПО";
+                String[] arrAddress = updated.getAddressFree().split(phrase, 2);*/
 
+                String updatedAddressFree = form.getAddressFree();
+                if(!updatedAddressFree.trim().equalsIgnoreCase(taddress.getAddressFree().trim())){
+
+                    var addressesRes = new TCustomer.Addresses();
+                    Taddress addressRes = new Taddress();
+                    addressRes.setAddressType(TAddressType.LEGAL);
+                    addressRes.setAddressFree(updatedAddressFree);
+                    addressRes.setAddressID(BigInteger.valueOf(-1));
+                    addressesRes.getAddress().add(addressRes);
+                    result.setAddresses(addressesRes);
+                }
+            }
         }
+
+        String updatedDocNumber = form.getDocNumber();
+        if (!updatedDocNumber.trim().equalsIgnoreCase(origin.getDocFO().getDocNumber().trim())){
+            TdocFO document = new TdocFO();
+            document.setDocSerial(form.getDocSerial());
+            document.setDocNumber(form.getDocNumber());
+            document.setDocDate(oneBoxCalendar(form.getDocDate()));
+            document.setDocWho(form.getDocWho());
+            document.setDocType(form.getDocType());
+            document.setDocDatestart(oneBoxCalendar(form.getDocDatestart()));
+            document.setDocDateStop(oneBoxCalendar(form.getDocDateStop()));
+            document.setDocSDRnumber(form.getDocSDRnumber());
+            document.setChanged(true);
+            result.setDocFO(document);
+        }
+
+        var bankDetails = new TCustomer.BankDetails();
+        List<TBankDetail> originListBankDetail = origin.getBankDetails().getBankDetail();
+        addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo(), form.getIban(), form.getCardAccount(), form.getBankName(),
+                form.getCurrency(), form.getBic(), form.getLei(), form.isUse4Income(), form.getType());
+        addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo1(), form.getIban1(), form.getCardAccount1(), form.getBankName1(),
+                form.getCurrency1(), form.getBic1(), form.getLei1(), form.isUse4Income1(), form.getType1());
+        addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo2(), form.getIban2(), form.getCardAccount2(), form.getBankName2(),
+                form.getCurrency2(), form.getBic2(), form.getLei2(), form.isUse4Income2(), form.getType2());
+        addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo3(), form.getIban3(), form.getCardAccount3(), form.getBankName3(),
+                form.getCurrency3(), form.getBic3(), form.getLei3(), form.isUse4Income3(), form.getType3());
 
 
         return result;
+    }
+
+    private static void addUpdatedBankDetail(TCustomer.BankDetails bankDetails, List<TBankDetail> originListBankDetail, String mfo, String iban, String cardAccount,
+                                             String bankName, String currency, String bic, String lei, boolean use4Income, Integer type) {
+        boolean find = false;
+        if (iban != null) {
+            for (TBankDetail tBankDetail : originListBankDetail) {
+                if (iban.trim().equalsIgnoreCase(tBankDetail.getIBAN().trim())) {
+                    find = true;
+                    break;
+                }
+            }
+            if (!find) {
+                    addBankDetail(bankDetails, mfo, iban, cardAccount, bankName, currency, bic, lei, use4Income, type);
+            }
+        }
     }
 
 }

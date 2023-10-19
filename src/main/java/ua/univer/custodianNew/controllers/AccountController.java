@@ -32,64 +32,18 @@ public class AccountController extends BaseController {
         super(marshaller, httpClient);
     }
 
-/*
-
-    @PostMapping (value = "/" + NEW_ACCOUNT + "Test")
-    public ResponseEntity<String> getNewAccountTest (@RequestBody @Valid FormFO form, BindingResult result) throws IOException {
-
-        if (result.hasErrors()){
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(),HttpStatus.BAD_REQUEST);
-        }
-
-        Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest(form.getRequestID());
-        tHeaderRequest.setRequestType(NEW_ACCOUNT);
-        request.setHeader(tHeaderRequest);
-
-        TbodyRequest tbodyRequest = Util.convertFormToNewAccount(form);
-        request.setBody(tbodyRequest);
-
-        Writer writer = new StringWriter();
-        saveXmlToWriter(request, writer);
-        File file = Util.getFile("ReqNewAcc", ".xml");
-        Files.writeString(file.toPath(), writer.toString());
-
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(DECKRA_URL_FAKE))
-                .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
-                .header("Content-Type", "application/xml")
-                .build();
-
-        HttpResponse<String> response;
-        try {
-            response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Deckra-service. Message - " + e.getMessage());
-        }
-
-        file = Util.getFile("ResponceNewAcc", ".txt");
-        Files.writeString(file.toPath(), response.body());
-        writer.close();
-
-        return ResponseEntity.ok().body(response.body());
-    }
-
-*/
 
     @PostMapping(value = "/TEST/" + NEW_ACCOUNT + "FO")
-    public ResponseEntity<String> testGetNewAccountFO (@RequestBody @Valid FormFO form, BindingResult result) throws IOException {
+    public ResponseEntity<String> testGetNewAccountFO (@RequestBody @Valid FormFO form) throws IOException {
 
-        logger.info("Method NewAccount TEST.");
+        logger.info("Method NewAccount. TEST.");
         long time = System.nanoTime();
 
-        if (result.hasErrors()){
+      /*  if (result.hasErrors()){
             StringBuilder sb = new StringBuilder();
             result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
             return new ResponseEntity<>(sb.toString(),HttpStatus.BAD_REQUEST);
-        }
+        }*/
 
         Request request = new Request();
 
@@ -106,16 +60,10 @@ public class AccountController extends BaseController {
 
     @Operation(summary = "Відкриття рахунку")
     @PostMapping(value = "/" + NEW_ACCOUNT + "FO")
-    public ResponseEntity<String> getNewAccountFO (@RequestBody @Valid FormFO form, BindingResult result) throws IOException {
+    public ResponseEntity<String> getNewAccountFO (@RequestBody @Valid FormFO form) throws IOException {
 
         logger.info("Method NewAccount. Production");
         long time = System.nanoTime();
-
-        if (result.hasErrors()){
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(),HttpStatus.BAD_REQUEST);
-        }
 
         Request request = new Request();
 
@@ -131,17 +79,10 @@ public class AccountController extends BaseController {
     }
 
 
-
     @PostMapping(value = "/TEST/getAccount")
-    public ResponseEntity<String> testGetAccount (@RequestBody @Valid FormGet form, BindingResult result) throws IOException {
+    public ResponseEntity<String> testGetAccount (@RequestBody @Valid FormGet form) throws IOException {
 
         long time = System.nanoTime();
-
-        if (result.hasErrors()) {
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
-        }
 
         Request request = getRequestWithHeader("GetAccountNum", true);
 
@@ -156,10 +97,7 @@ public class AccountController extends BaseController {
         accountNumRequest.setCNUM(cnum);
 
         var typeCode = new TAccountNumRequest.ClientTypeCode();
-        if ("-1".equals(form.getClientTypeCode())){
-            form.setClientTypeCode("0");
-        }
-        typeCode.setValue(form.getClientTypeCode());
+        typeCode.setValue("-1".equals(form.getClientTypeCode()) ? "0" : form.getClientTypeCode());
         accountNumRequest.setClientTypeCode(typeCode);
 
         var country = new TAccountNumRequest.Country();
@@ -195,24 +133,11 @@ public class AccountController extends BaseController {
 
     @Operation(summary = "Запит номера рахунку")
     @PostMapping(value = "/getAccount")
-    public ResponseEntity<String> getAccount (@RequestBody @Valid FormGet form, BindingResult result) throws IOException {
+    public ResponseEntity<String> getAccount (@RequestBody @Valid FormGet form) throws IOException {
 
-        //logger.info("Method GetAccount. Production");
         long time = System.nanoTime();
 
-        if (result.hasErrors()) {
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
-        }
-
         Request request = getRequestWithHeader("GetAccountNum", false);
-
-        /*Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
-        tHeaderRequest.setRequestType("GetAccountNum");
-        request.setHeader(tHeaderRequest);*/
 
         TAccountNumRequest accountNumRequest = new TAccountNumRequest();
 
@@ -225,10 +150,7 @@ public class AccountController extends BaseController {
         accountNumRequest.setCNUM(cnum);
 
         var typeCode = new TAccountNumRequest.ClientTypeCode();
-        if ("-1".equals(form.getClientTypeCode())){
-            form.setClientTypeCode("0");
-        }
-        typeCode.setValue(form.getClientTypeCode());
+        typeCode.setValue("-1".equals(form.getClientTypeCode()) ? "0" : form.getClientTypeCode());
         accountNumRequest.setClientTypeCode(typeCode);
 
         var country = new TAccountNumRequest.Country();
@@ -267,15 +189,8 @@ public class AccountController extends BaseController {
     @PostMapping(value = "/accountReserveCancel")
     public ResponseEntity<String> accountReserveCancel (@RequestBody FormReserveCancel form) throws IOException {
 
-        //logger.info("Method AccountNumReserveCancel. Production");
         long time = System.nanoTime();
         Request request = getRequestWithHeader("AccountNumReserveCancel", false);
-
-        /*Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
-        tHeaderRequest.setRequestType("AccountNumReserveCancel");
-        request.setHeader(tHeaderRequest);*/
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setAccountNumReserveCancel(form.getAccount());

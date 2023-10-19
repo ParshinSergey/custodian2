@@ -1,6 +1,7 @@
 package ua.univer.custodianNew.controllers;
 
 import dmt.custodian2016.*;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.HttpStatus;
@@ -34,16 +35,17 @@ public class BalanceController extends BaseController {
     }
 
     @PostMapping(value = "/TEST/account")
-    public ResponseEntity<String> balanceAccount(@RequestBody FormBalance form) throws IOException {
+    public ResponseEntity<String> balanceAccount(@RequestBody @Valid FormBalance form) throws IOException {
 
-        logger.info("Method BalanceV2.");
+        //logger.info("Method BalanceV2.");
         long time = System.nanoTime();
 
-        Request request = new Request();
+        Request request = getRequestWithHeader("BalanceV2", true);
+      /*  Request request = new Request();
 
         THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
         tHeaderRequest.setRequestType("BalanceV2");
-        request.setHeader(tHeaderRequest);
+        request.setHeader(tHeaderRequest);*/
 
         TBalanceRequest balance = new TBalanceRequest();
         balance.setAccount(form.getAccount());
@@ -63,17 +65,14 @@ public class BalanceController extends BaseController {
         return getResponseEntity(time, request, DECKRA_URL_80,"Balance");
     }
 
-    @PostMapping(value = "/accountV2", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> balanceAccV2(@RequestBody FormBalance form) throws IOException {
 
-        logger.info("Statement_of_HoldingsV2. Production");
+    @Operation(summary = "Виписка про стан рахунку (V2)")
+    @PostMapping(value = "/accountV2", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> balanceAccV2(@RequestBody @Valid FormBalance form) throws IOException {
+
         long time = System.nanoTime();
 
-        Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
-        tHeaderRequest.setRequestType("Statement_of_HoldingsV2");
-        request.setHeader(tHeaderRequest);
+        Request request = getRequestWithHeader("Statement_of_HoldingsV2", false);
 
         TStatementOfHoldingsRequest statement = new TStatementOfHoldingsRequest();
         statement.setAccount(form.getAccount());
@@ -93,22 +92,13 @@ public class BalanceController extends BaseController {
         return getResponseEntity(time, request, DECKRA_URL_PROD, "Statement");
     }
 
-    @PostMapping(value = "/TEST/statementV2")
-    public ResponseEntity<String> statementV2(@RequestBody @Valid FormStatement form, BindingResult result) throws IOException {
 
-        logger.info("Statement_of_TransactionV2.");
-        if (result.hasErrors()){
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
-        }
+    @PostMapping(value = "/TEST/statementV2")
+    public ResponseEntity<String> statementV2(@RequestBody @Valid FormStatement form) throws IOException {
+
         long time = System.nanoTime();
 
-        Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
-        tHeaderRequest.setRequestType("Statement_of_TransactionV2");
-        request.setHeader(tHeaderRequest);
+        Request request = getRequestWithHeader("Statement_of_TransactionV2", true);
 
         TStatementOfTransactionsRequest statement = new TStatementOfTransactionsRequest();
 
@@ -131,24 +121,17 @@ public class BalanceController extends BaseController {
 
     }
 
+
     @PostMapping(value = "/statementBinary")
-    public ResponseEntity<String> statementBinary(@RequestBody @Valid FormStatementFile form, BindingResult result) throws IOException {
+    public ResponseEntity<String> statementBinary(@RequestBody @Valid FormStatementFile form) throws IOException {
 
         logger.info("Statement_of_Transaction. Binary. Production");
-        if (result.hasErrors()){
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
-        }
         long time = System.nanoTime();
 
         Request request = new Request();
 
         THeaderRequest tHeaderRequest = Util.getHeaderRequest();
         tHeaderRequest.setRequestType("Statement_of_Transaction");
-
-        // tHeaderRequest.setSourceAPPidentity("3000350A-429D-4632-81B7-B31C02C7D980");
-
         var binary = new THeaderRequest.Binary();
         binary.setBinary(true);
         binary.setTemplate(STATEMENT_TEMPLATE);
@@ -178,20 +161,16 @@ public class BalanceController extends BaseController {
     }
 
     @PostMapping(value = "/TEST/statementBinary")
-    public ResponseEntity<String> testStatementBinary(@RequestBody @Valid FormStatementFile form, BindingResult result) throws IOException {
+    public ResponseEntity<String> testStatementBinary(@RequestBody @Valid FormStatementFile form) throws IOException {
 
         logger.info("Statement_of_Transaction. Binary. TEST.");
-        if (result.hasErrors()){
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
-        }
         long time = System.nanoTime();
 
         Request request = new Request();
 
         THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
         tHeaderRequest.setRequestType("Statement_of_Transaction");
+        // tHeaderRequest.setSourceAPPidentity("3000350A-429D-4632-81B7-B31C02C7D980");
         var binary = new THeaderRequest.Binary();
         binary.setBinary(true);
         binary.setTemplate(STATEMENT_TEMPLATE);
@@ -223,14 +202,9 @@ public class BalanceController extends BaseController {
 
 
     @PostMapping(value = "/statementPDF")
-    public ResponseEntity<String> statementPDF(@RequestBody @Valid FormStatementPDF form, BindingResult result) throws IOException {
+    public ResponseEntity<String> statementPDF(@RequestBody @Valid FormStatementPDF form) throws IOException {
 
         logger.info("Statement_of_Transaction. statementPDF. Production");
-        if (result.hasErrors()){
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
-        }
         long time = System.nanoTime();
 
         Request request = new Request();
@@ -306,14 +280,9 @@ public class BalanceController extends BaseController {
 
 
     @PostMapping(value = "/TEST/getStatementPDF")
-    public ResponseEntity<String> getStatementPDF(@RequestBody @Valid FormStatementPDF form, BindingResult result) throws IOException {
+    public ResponseEntity<String> getStatementPDF(@RequestBody @Valid FormStatementPDF form) throws IOException {
 
         logger.info("Statement_of_Transaction. getStatementPDF. TEST");
-        if (result.hasErrors()){
-            StringBuilder sb = new StringBuilder();
-            result.getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
-        }
         long time = System.nanoTime();
 
         Request request = new Request();
