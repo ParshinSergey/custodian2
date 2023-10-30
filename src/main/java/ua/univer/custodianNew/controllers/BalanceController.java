@@ -7,7 +7,6 @@ import jakarta.xml.bind.Marshaller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ua.univer.custodianNew.dto.*;
@@ -20,7 +19,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import static ua.univer.custodianNew.util.FileDownloadService.byteArrStorage;
-import static ua.univer.custodianNew.util.FileDownloadService.fileStorage;
 
 @RestController
 @RequestMapping(value = "/api/balance", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -34,18 +32,12 @@ public class BalanceController extends BaseController {
         super(marshaller, httpClient);
     }
 
+
     @PostMapping(value = "/TEST/account")
     public ResponseEntity<String> balanceAccount(@RequestBody @Valid FormBalance form) throws IOException {
 
-        //logger.info("Method BalanceV2.");
         long time = System.nanoTime();
-
         Request request = getRequestWithHeader("BalanceV2", true);
-      /*  Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
-        tHeaderRequest.setRequestType("BalanceV2");
-        request.setHeader(tHeaderRequest);*/
 
         TBalanceRequest balance = new TBalanceRequest();
         balance.setAccount(form.getAccount());
@@ -62,7 +54,7 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DECKRA_URL_80,"Balance");
+        return getResponseEntity(time, request, DEKRA_URL_80,"Balance");
     }
 
 
@@ -71,7 +63,6 @@ public class BalanceController extends BaseController {
     public ResponseEntity<String> balanceAccV2(@RequestBody @Valid FormBalance form) throws IOException {
 
         long time = System.nanoTime();
-
         Request request = getRequestWithHeader("Statement_of_HoldingsV2", false);
 
         TStatementOfHoldingsRequest statement = new TStatementOfHoldingsRequest();
@@ -89,7 +80,7 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DECKRA_URL_PROD, "Statement");
+        return getResponseEntity(time, request, DEKRA_URL_PROD, "Statement");
     }
 
 
@@ -97,7 +88,6 @@ public class BalanceController extends BaseController {
     public ResponseEntity<String> statementV2(@RequestBody @Valid FormStatement form) throws IOException {
 
         long time = System.nanoTime();
-
         Request request = getRequestWithHeader("Statement_of_TransactionV2", true);
 
         TStatementOfTransactionsRequest statement = new TStatementOfTransactionsRequest();
@@ -117,7 +107,7 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DECKRA_URL_80, "Statement");
+        return getResponseEntity(time, request, DEKRA_URL_80, "Statement");
 
     }
 
@@ -156,9 +146,10 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DECKRA_URL_PROD, "StatementBinary");
+        return getResponseEntity(time, request, DEKRA_URL_PROD, "StatementBinary");
 
     }
+
 
     @PostMapping(value = "/TEST/statementBinary")
     public ResponseEntity<String> testStatementBinary(@RequestBody @Valid FormStatementFile form) throws IOException {
@@ -195,12 +186,11 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DECKRA_URL_80, "StatementBinary");
+        return getResponseEntity(time, request, DEKRA_URL_80, "StatementBinary");
 
     }
 
-
-
+    @Operation(summary = "Виписка про операції у форматі PDF")
     @PostMapping(value = "/statementPDF")
     public ResponseEntity<String> statementPDF(@RequestBody @Valid FormStatementPDF form) throws IOException {
 
@@ -235,7 +225,7 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequest(request, DECKRA_URL_PROD, "StatementPDF");
+        String dekraResponse = writeAndSendRequest(request, DEKRA_URL_PROD, "StatementPDF");
         Responce responce = getResponceFromXml(dekraResponse);
         String b64 = responce.getBody().getBinary();
 
@@ -313,37 +303,9 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_80, "getStatementPDF");
+        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_80, "getStatementPDF");
         Responce responce = getResponceFromXml(dekraResponse);
         String b64 = responce.getBody().getBinary();
-
-               /* Writer writer = new StringWriter();
-        saveXmlToWriter(request, writer);
-        File file1 = Util.getFile("TransactionPDF", ".xml");
-        Files.writeString(file1.toPath(), writer.toString());
-
-
-        HttpRequest httpRequest1 = HttpRequest.newBuilder()
-                .uri(URI.create(DECKRA_URL_80))
-                .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
-                .header("Content-Type", "application/xml")
-                .build();
-
-        writer.close();
-
-        HttpResponse<String> httpResponse1 = null;
-        try {
-            httpResponse1 = httpClient.send(httpRequest1, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            logger.warn("Error connecting to Deckra-service");
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Deckra-service. Message - " + e.getMessage());
-        }
-
-        String response = httpResponse1.body();
-
-        Responce responce = getResponceFromXml(response);
-        String b64 = responce.getBody().getBinary();
-*/
 
         byte[] decoded = org.apache.commons.codec.binary.Base64.decodeBase64(b64);
         String fileName = String.format("%s_%s_%s_%s.pdf", form.getAccount(), form.getIsin(), form.getDateStart(), form.getDateStop());

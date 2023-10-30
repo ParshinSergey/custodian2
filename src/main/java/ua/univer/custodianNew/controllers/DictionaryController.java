@@ -28,7 +28,7 @@ public class DictionaryController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DECKRA_URL_PROD, "GetDictionary");
+        return getResponseEntity(time, request, DEKRA_URL_PROD, "GetDictionary");
 
     }
 
@@ -51,7 +51,7 @@ public class DictionaryController extends BaseController {
         tbodyRequest.setDictionary(form);
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DECKRA_URL_80, "GetDictionary");
+        return getResponseEntity(time, request, DEKRA_URL_80, "GetDictionary");
 
     }
 
@@ -63,7 +63,7 @@ public class DictionaryController extends BaseController {
         TbodyRequest tbodyRequest = new TbodyRequest();
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_80, "GetDictionaries");
+        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_80, "GetDictionaries");
 
         return ResponseEntity.ok().body(dekraResponse);
 

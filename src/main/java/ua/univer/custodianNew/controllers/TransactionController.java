@@ -1,7 +1,6 @@
 package ua.univer.custodianNew.controllers;
 
 import dmt.custodian2016.*;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -102,7 +101,7 @@ public class TransactionController extends BaseController{
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DECKRA_URL_80,"transaction");
+        return getResponseEntity(time, request, DEKRA_URL_80,"transaction");
 
     }
 

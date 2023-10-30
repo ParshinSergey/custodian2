@@ -23,9 +23,9 @@ import java.nio.file.Files;
 
 public class BaseController {
 
-    public static final String DECKRA_URL_80 = "https://10.1.2.80/API_BP/cp_api.dll";
-    public static final String DECKRA_URL_PROD = "https://10.1.2.204/API_BP/cp_api.dll";
-    public static final String DECKRA_URL_FAKE = "http://localhost:8081/api/service/result";
+    public static final String DEKRA_URL_80 = "https://10.1.2.80/API_BP/cp_api.dll";
+    public static final String DEKRA_URL_PROD = "https://10.1.2.204/API_BP/cp_api.dll";
+    public static final String DEKRA_URL_FAKE = "http://localhost:8081/api/service/result";
 
     Logger logger = LoggerFactory.getLogger(BaseController.class);
 
@@ -88,7 +88,7 @@ public class BaseController {
 
     protected String writeAndSendRequestWriteResponseToFile(Request request, String ipAddress, String prefix) throws IOException {
 
-        Writer writer = new StringWriter();
+      /*  Writer writer = new StringWriter();
         saveXmlToWriter(request, writer);
         File file = Util.getFile(prefix, ".xml");
         Files.writeString(file.toPath(), writer.toString());
@@ -107,8 +107,11 @@ public class BaseController {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Deckra-service. Message - " + e.getMessage());
         }
 
-        String response = httpResponse.body();
+        String response = httpResponse.body();*/
 
+        String response = writeAndSendRequest(request, ipAddress, prefix);
+
+        File file;
         try {
             file = Util.getFile("Response", ".xml");
             Files.writeString(file.toPath(), response);
@@ -116,10 +119,10 @@ public class BaseController {
         catch (IOException e){
             logger.info("Error writing Output message to file.");
         }
-        finally {
+       /* finally {
             writer.close();
         }
-
+*/
         return response;
     }
 
@@ -143,7 +146,7 @@ public class BaseController {
             httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
             logger.warn("Error connecting to Deckra-service");
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Deckra-service. Message - " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Dekra-service. Message - " + e.getMessage());
         }
 
         return httpResponse.body();
@@ -169,9 +172,9 @@ public class BaseController {
     protected ResponseEntity<String> getResponseEntity(long time, Request request, String ipAddress, String methodName) throws IOException {
         String dekraResponse = writeAndSendRequestWriteResponseToFile(request, ipAddress, methodName);
         Responce responce = getResponceFromXml(dekraResponse);
-        String jsonResponse = ConverterUtil.objectToJson(responce);
-
+       // String jsonResponse = ConverterUtil.objectToJson(responce);
         if (responce == null) {
+            logger.warn("Произошла ошибка " + dekraResponse);
             return ResponseEntity.internalServerError().body("Произошла ошибка " + dekraResponse);
         } else {
             if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())) {
@@ -179,7 +182,7 @@ public class BaseController {
                 return ResponseEntity.badRequest().body(answer);
             } else {
                 logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
-                return ResponseEntity.ok().body(jsonResponse);
+                return ResponseEntity.ok().body(ConverterUtil.objectToJson(responce));
             }
         }
     }

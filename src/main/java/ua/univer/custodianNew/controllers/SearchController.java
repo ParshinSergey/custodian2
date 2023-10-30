@@ -1,9 +1,9 @@
 package ua.univer.custodianNew.controllers;
 
 import dmt.custodian2016.*;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.xml.bind.Marshaller;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,40 +26,33 @@ public class SearchController extends BaseController{
         super(marshaller, httpClient);
     }
 
-
-    @GetMapping(value = "/TEST/accountV2")
+    @Operation(summary = "Пошуковий запит. Перелік рахунків у ЦБ(V2)")
+    @PostMapping(value = "/accountV2", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> searchAccountV2 (@RequestBody FormSearch form) throws IOException {
 
-        logger.info("Method SearchAccountV2.");
-
-        Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
-        tHeaderRequest.setRequestType("SearchAccountV2");
-        request.setHeader(tHeaderRequest);
+        long time = System.nanoTime();
+        Request request = getRequestWithHeader("SearchAccountV2", false);
 
         TbodyRequest tbodyRequest = Util.convertFormToSearchAccountV2(form);
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_80, "SearchAccV2");
+        return getResponseEntity(time, request, DEKRA_URL_PROD, "SearchAccountV2");
+       /* String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_80, "SearchAccV2");
 
-        return ResponseEntity.ok().body(dekraResponse);
+        return ResponseEntity.ok().body(dekraResponse);*/
     }
 
 
     @PostMapping(value = "/TEST/account")
     public ResponseEntity<String> searchAccount (@RequestBody @Valid FormSearchAccount account) throws IOException {
 
+        long time = System.nanoTime();
         Request request = getRequestWithHeader("SearchAccount", true);
 
         TbodyRequest tbodyRequest = convertFormToSearchAccount(account);
-        //TbodyRequest tbodyRequest = new TbodyRequest();
-       // tbodyRequest.setSearchAccount(account);
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_80, "SearchAcc");
-
-        return ResponseEntity.ok().body(dekraResponse);
+        return getResponseEntity(time, request, DEKRA_URL_80, "SearchAcc");
     }
 
 
@@ -74,7 +67,7 @@ public class SearchController extends BaseController{
         tbodyRequest.setSearchCustomer(customer);
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DECKRA_URL_80, "SearchCustomer");
+        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_80, "SearchCustomer");
 
         return ResponseEntity.ok().body(dekraResponse);
 
