@@ -8,6 +8,8 @@ import ua.univer.custodianNew.dto.FormSearch;
 import ua.univer.custodianNew.dto.FormSearchAccount;
 import ua.univer.custodianNew.dto.FormSearchCustomer;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import static ua.univer.custodianNew.util.DateTimeUtil.*;
 
 import java.io.File;
@@ -292,8 +294,6 @@ public final class Util {
 
 
 
-
-
     public static TbodyRequest convertFormToSearchAccountV2(FormSearch form) {
 
         var searchAccountV2 = new TSearchAccountV2();
@@ -301,7 +301,8 @@ public final class Util {
         searchAccountV2.setName(form.getName());
         searchAccountV2.setIDCode(form.getIdCode());
         searchAccountV2.setCNUM(form.getCnum());
-        searchAccountV2.setState(form.getState());
+       // searchAccountV2.setState(form.getState());
+        searchAccountV2.setState("-1".equals(form.getState()) ? "0" : form.getState());
         searchAccountV2.setStatus(form.getStatus());
         if (form.getDocNumber() != null) {
             var document = new TSearchAccountV2.DocFO();
@@ -368,7 +369,7 @@ public final class Util {
         result.setCustomerID(origin.getCustomerID());
 
         String updatedCnum = form.getCnum();
-        if (updatedCnum != null && !updatedCnum.trim().equalsIgnoreCase(origin.getCNUM().getValue().trim())){
+        if (updatedCnum != null && !updatedCnum.trim().equalsIgnoreCase(origin.getCNUM().getValue())){
             var cnum = new TupdateCustomer.CNUM();
             cnum.setValue(updatedCnum);
             cnum.setChanged(true);
@@ -376,7 +377,7 @@ public final class Util {
         }
 
         String updatedCountry = form.getCountry();
-        if (updatedCountry != null && !updatedCountry.trim().equalsIgnoreCase(origin.getCountry().getValue().trim())){
+        if (updatedCountry != null && !updatedCountry.trim().equalsIgnoreCase(origin.getCountry().getValue())){
             var country = new TupdateCustomer.Country();
             country.setValue(updatedCountry);
             country.setChanged(true);
@@ -384,7 +385,7 @@ public final class Util {
         }
 
         String updatedCountryTax = form.getCountryTax();
-        if (updatedCountryTax != null && !updatedCountryTax.trim().equalsIgnoreCase(origin.getCountryTax().getValue().trim())){
+        if (updatedCountryTax != null && !updatedCountryTax.trim().equalsIgnoreCase(origin.getCountryTax().getValue())){
             var countryTax = new TupdateCustomer.CountryTax();
             countryTax.setValue(updatedCountryTax);
             countryTax.setChanged(true);
@@ -402,21 +403,22 @@ public final class Util {
         }
         */
 
-        // longName не поменяется если не меняется shortName
         String updatedShortName = form.getShortName();
         String updatedLongName = form.getLongName();
-        if (updatedShortName != null && !updatedShortName.trim().equalsIgnoreCase(origin.getName().getShortName().getValue().trim())){
-            var name = new TName();
+        var name = new TName();
+        if (updatedShortName != null && !updatedShortName.trim().equalsIgnoreCase(origin.getName().getShortName().getValue())) {
             var shortName = new TName.ShortName();
-            shortName.setValue(updatedShortName);
+            shortName.setValue(updatedShortName.trim());
             shortName.setChanged(true);
             name.setShortName(shortName);
+        }
+        if (updatedLongName != null && !updatedLongName.trim().equalsIgnoreCase(origin.getName().getLongName().getValue())) {
             var longName = new TName.LongName();
-            longName.setValue(updatedLongName);
+            longName.setValue(updatedLongName.trim());
             longName.setChanged(true);
             name.setLongName(longName);
-            result.setName(name);
         }
+        result.setName(name);
 
         // Меняется только adressFree. Чтобы не затирать в Декре дома, улицы и т.п.
         List<Taddress> address = origin.getAddresses().getAddress();
@@ -431,7 +433,7 @@ public final class Util {
                     var addressesRes = new TupdateCustomer.Addresses();
                     Taddress addressRes = new Taddress();
                     addressRes.setAddressType(TAddressType.LEGAL);
-                    addressRes.setAddressFree(updatedAddressFree);
+                    addressRes.setAddressFree(updatedAddressFree.trim());
                     addressRes.setAddressID(BigInteger.valueOf(-1));
                     addressRes.setChanged(true);
                     addressesRes.getAddress().add(addressRes);
@@ -441,7 +443,7 @@ public final class Util {
         }
 
         String updatedDocNumber = form.getDocNumber();
-        if (updatedDocNumber != null && (origin.getDocFO() == null || !updatedDocNumber.trim().equalsIgnoreCase(origin.getDocFO().getDocNumber().trim()))){
+        if (updatedDocNumber != null && (origin.getDocFO() == null || !updatedDocNumber.trim().equalsIgnoreCase(origin.getDocFO().getDocNumber()))){
             TdocFO document = new TdocFO();
             document.setDocSerial(form.getDocSerial());
             document.setDocNumber(form.getDocNumber());
@@ -467,6 +469,57 @@ public final class Util {
                 form.getCurrency3(), form.getBic3(), form.getLei3(), form.isUse4Income3(), form.getType3());
         result.setBankDetails(bankDetails);
 
+        var contact = new TupdateCustomer.Contact();
+        String updatedPhone = form.getPhone();
+        if (updatedPhone != null && !updatedPhone.trim().equalsIgnoreCase(origin.getContact().getPhone().getValue())) {
+            var phone = new TContact.Phone();
+            phone.setValue(updatedPhone);
+            phone.setChanged(true);
+            contact.setPhone(phone);
+        }
+        String updatedMobilePhone = form.getMobilePhone();
+        if (updatedMobilePhone != null && !updatedMobilePhone.trim().equalsIgnoreCase(origin.getContact().getMobilePhone().getValue())){
+            var mobilePhone = new TContact.MobilePhone();
+            mobilePhone.setValue(updatedMobilePhone);
+            mobilePhone.setChanged(true);
+            contact.setMobilePhone(mobilePhone);
+        }
+        String updatedMailGeneral = form.geteMailGeneral();
+        if (updatedMailGeneral != null && !updatedMailGeneral.trim().equalsIgnoreCase(origin.getContact().getEMails().getEMailGeneral().getValue())){
+            var eMails = new TContact.EMails();
+            var eMailGeneral = new TContact.EMails.EMailGeneral();
+            eMailGeneral.setValue(updatedMailGeneral);
+            eMailGeneral.setChanged(true);
+            eMails.setEMailGeneral(eMailGeneral);
+            var eMailInvoice = new TContact.EMails.EMailInvoice();
+            eMailInvoice.setValue(updatedMailGeneral);
+            eMailInvoice.setChanged(true);
+            eMails.setEMailInvoice(eMailInvoice);
+            var eMailCorporateEvent = new TContact.EMails.EMailCorporateEvent();
+            eMailCorporateEvent.setValue(updatedMailGeneral);
+            eMailCorporateEvent.setChanged(true);
+            eMails.setEMailCorporateEvent(eMailCorporateEvent);
+            var eMailStatement = new TContact.EMails.EMailStatement();
+            eMailStatement.setValue(updatedMailGeneral);
+            eMailStatement.setChanged(true);
+            eMails.setEMailStatement(eMailStatement);
+            contact.setEMails(eMails);
+        }
+        result.setContact(contact);
+
+        var birthInfo = new TupdateCustomer.BirthInfo();
+        String updatedBirthPlace = form.getBirthPlace();
+        if (updatedBirthPlace != null && !updatedBirthPlace.trim().equalsIgnoreCase(origin.getBirthInfo().getBirthPlace())){
+            birthInfo.setBirthPlace(updatedBirthPlace.trim());
+            birthInfo.setChanged(true);
+        }
+        XMLGregorianCalendar updatedBirthDate = oneBoxCalendar(form.getBirthDate());
+        if (updatedBirthDate != null && updatedBirthDate.compare(origin.getBirthInfo().getBirthDate()) != 0){
+            birthInfo.setBirthDate(updatedBirthDate);
+            birthInfo.setChanged(true);
+        }
+        result.setBirthInfo(birthInfo);
+
 
         return result;
     }
@@ -477,7 +530,7 @@ public final class Util {
         boolean find = false;
         if (iban != null) {
             for (TBankDetail tBankDetail : originListBankDetail) {
-                if (iban.trim().equalsIgnoreCase(tBankDetail.getIBAN().trim())) {
+                if (iban.trim().equalsIgnoreCase(tBankDetail.getIBAN())) {
                     find = true;
                     break;
                 }

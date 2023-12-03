@@ -65,7 +65,7 @@ public class FormFO {
     private String docDateStop;
     private String docSDRnumber;
 
-    @Size(max = 6)
+    @Pattern(regexp = "^\\d{6}$|^$", message = "должно состоять из шести цифр или быть пустым")
     private String mfo;
     @Size(max = 34)
     private String iban;
@@ -80,11 +80,10 @@ public class FormFO {
     private String bic;
     @Size(max = 20)
     private String lei;
-    //private Integer bankDetailID;
     private boolean use4Income;
     private Integer type;
 
-    @Size(max = 6)
+    @Pattern(regexp = "^\\d{6}$|^$", message = "должно состоять из шести цифр или быть пустым")
     private String mfo1;
     @Size(max = 34)
     private String iban1;
@@ -101,7 +100,7 @@ public class FormFO {
     private boolean use4Income1;
     private Integer type1;
 
-    @Size(max = 6)
+    @Pattern(regexp = "^\\d{6}$|^$", message = "должно состоять из шести цифр или быть пустым")
     private String mfo2;
     @Size(max = 34)
     private String iban2;
@@ -118,7 +117,7 @@ public class FormFO {
     private boolean use4Income2;
     private Integer type2;
 
-    @Size(max = 6)
+    @Pattern(regexp = "^\\d{6}$|^$", message = "должно состоять из шести цифр или быть пустым")
     private String mfo3;
     @Size(max = 34)
     private String iban3;

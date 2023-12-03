@@ -1,8 +1,6 @@
 package ua.univer.custodianNew.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,8 +18,11 @@ public class FormSearch {
     private String docNumber;
     private String state;
     private String status;
+    @Positive
     private String maxRecord;
     private String type;
+    @Positive
+    private String brokerID;
 
 
 }

@@ -252,7 +252,9 @@ public class BalanceController extends BaseController {
 
         HttpResponse<String> httpResponse;
         try {
+            logger.info("before send to OneBox");
             httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            logger.info("after send to OneBox");
         } catch (IOException | InterruptedException e) {
             logger.warn("Error connecting to OneBox");
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to OneBox. Message - " + e.getMessage());
@@ -329,7 +331,9 @@ public class BalanceController extends BaseController {
 
         HttpResponse<String> httpResponse;
         try {
+            logger.info("before send to OneBox");
             httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            logger.info("after send to OneBox");
         } catch (IOException | InterruptedException e) {
             logger.warn("Error connecting to OneBox");
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to OneBox. Message - " + e.getMessage());

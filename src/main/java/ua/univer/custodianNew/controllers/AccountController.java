@@ -118,9 +118,10 @@ public class AccountController extends BaseController {
 
     }
 
+
     @Operation(summary = "Запит номера рахунку")
-    @PostMapping(value = "/getAccount")
-    public ResponseEntity<String> getAccount (@RequestBody @Valid FormGet form) throws IOException {
+    @PostMapping(value = "/getAccountNum")
+    public ResponseEntity<String> getAccountNum (@RequestBody @Valid FormGet form) throws IOException {
 
         long time = System.nanoTime();
         Request request = getRequestWithHeader("GetAccountNum", false);
@@ -147,7 +148,7 @@ public class AccountController extends BaseController {
         tbodyRequest.setAccountNum(accountNumRequest);
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_PROD, "GetAccount");
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_PROD, "GetAccountNum");
 
         Responce responce = getResponceFromXml(deckraResponse);
 
@@ -168,6 +169,8 @@ public class AccountController extends BaseController {
             }
         }
     }
+
+
 
 
     @Operation(summary = "Скасування резервування номера рахунку")
@@ -199,7 +202,6 @@ public class AccountController extends BaseController {
         tbodyRequest.setAccount(account);
         request1.setBody(tbodyRequest);
 
-        //String dekraResponse = writeAndSendRequest(request1, DEKRA_URL_80, "Account");
         String dekraResponse = writeAndSendRequestWriteResponseToFile(request1, DEKRA_URL_80, "Account");
         Responce responce = getResponceFromXml(dekraResponse);
         TCustomer customer = responce.getBody().getAccount().getCustomer();
@@ -212,8 +214,6 @@ public class AccountController extends BaseController {
         tbodyRequest2.setUpdateCustomer(updCustomer);
         request2.setBody(tbodyRequest2);
 
-
-        //return ResponseEntity.ok().body(dekraResponse);
         return getResponseEntity(time, request2, DEKRA_URL_80, "UpdateCustomer");
     }
 
