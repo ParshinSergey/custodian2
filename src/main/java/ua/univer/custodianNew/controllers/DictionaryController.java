@@ -1,6 +1,7 @@
 package ua.univer.custodianNew.controllers;
 
 import dmt.custodian2016.*;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,27 +26,18 @@ public class DictionaryController extends BaseController {
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setDictionary(form);
-
         request.setBody(tbodyRequest);
 
         return getResponseEntity(time, request, DEKRA_URL_PROD, "GetDictionary");
 
     }
 
+
     @GetMapping(value = "/TEST/get")
     public ResponseEntity<String> testGetDictionary (@RequestBody TDictionaryCustomRequest form) throws IOException {
 
         long time = System.nanoTime();
         Request request = getRequestWithHeader("GetDictionary", true);
-
-       /* THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
-        tHeaderRequest.setRequestType("GetDictionary");
-        request.setHeader(tHeaderRequest);
-
-        var dictionaryCustomRequest = new TDictionaryCustomRequest();
-        dictionaryCustomRequest.setCode(form.getCode());
-        dictionaryCustomRequest.setData(form.isData());
-        dictionaryCustomRequest.setMetadata(form.isMetadata());*/
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setDictionary(form);
@@ -54,6 +46,7 @@ public class DictionaryController extends BaseController {
         return getResponseEntity(time, request, DEKRA_URL_80, "GetDictionary");
 
     }
+
 
     @GetMapping(value = "/TEST/getDictionaries", consumes = "*/*", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<String> testGetDictionaries () throws IOException {
@@ -68,6 +61,22 @@ public class DictionaryController extends BaseController {
         return ResponseEntity.ok().body(dekraResponse);
 
     }
+
+    @Operation(summary = "Перегляд анкети фінансового інструменту")
+    @PostMapping(value = "/getFI")
+    public ResponseEntity<String> getFI (@RequestBody TbodyRequest.GetFI form) throws IOException {
+
+        long time = System.nanoTime();
+        Request request = getRequestWithHeader("getFI", false);
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setGetFI(form);
+        request.setBody(tbodyRequest);
+
+        return getResponseEntity(time, request, DEKRA_URL_PROD, "getFI");
+
+    }
+
 
 
 }

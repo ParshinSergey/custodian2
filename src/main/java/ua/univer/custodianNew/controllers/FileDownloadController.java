@@ -73,7 +73,7 @@ public class FileDownloadController {
         }
 
         ByteArrayResource resource = new ByteArrayResource(byteArr);
-        logger.info("Content Length = " + resource.contentLength());
+        //logger.info("Content Length = " + resource.contentLength());
         String headerValue = "attachment; filename=\"" + fileName + "\"";
 
         downloadService.deleteFromStorage(fileName);

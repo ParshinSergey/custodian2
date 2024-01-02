@@ -7,17 +7,27 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.time.format.DateTimeParseException;
+
 @ControllerAdvice
 @Slf4j
 public class AppExceptionHandler {
 
+    private final static String TEXT_MISTAKE = "{\"textmistake\": \"%s\"}";
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationExceptions (MethodArgumentNotValidException ex) {
         StringBuilder sb = new StringBuilder();
-        ex.getBindingResult().getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("\n"));
-        log.warn(ex.getMessage());
-        log.info(sb.toString());
-        return new ResponseEntity<>(sb.toString(),HttpStatus.BAD_REQUEST);
+        ex.getBindingResult().getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append(" "));
+        log.warn(sb.toString());
+        return new ResponseEntity<>(String.format(TEXT_MISTAKE, sb.toString()),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<String> handleDateTimeExceptions (DateTimeParseException ex) {
+        String answer = String.format(TEXT_MISTAKE, "Ошибка в дате: " + ex.getMessage());
+        log.warn(answer);
+        return ResponseEntity.badRequest().body(answer);
     }
 
 }

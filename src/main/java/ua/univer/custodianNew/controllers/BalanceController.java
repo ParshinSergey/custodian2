@@ -250,7 +250,9 @@ public class BalanceController extends BaseController {
                 .header("Content-Type", "application/json")
                 .build();
 
-        HttpResponse<String> httpResponse;
+        httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+       /* HttpResponse<String> httpResponse;
         try {
             logger.info("before send to OneBox");
             httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -262,7 +264,7 @@ public class BalanceController extends BaseController {
 
         if (httpResponse.statusCode() != 200){
             return ResponseEntity.internalServerError().body(httpResponse.body());
-        }
+        }*/
 
         logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
 
