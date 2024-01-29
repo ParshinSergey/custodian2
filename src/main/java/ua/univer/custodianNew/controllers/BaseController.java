@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
+import ua.univer.custodianNew.exceptions.DekraException;
 import ua.univer.custodianNew.util.ConverterUtil;
 
 import java.io.*;
@@ -88,27 +89,6 @@ public class BaseController {
 
     protected String writeAndSendRequestWriteResponseToFile(Request request, String ipAddress, String prefix) throws IOException {
 
-      /*  Writer writer = new StringWriter();
-        saveXmlToWriter(request, writer);
-        File file = Util.getFile(prefix, ".xml");
-        Files.writeString(file.toPath(), writer.toString());
-
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(ipAddress))
-                .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
-                .header("Content-Type", "application/xml")
-                .build();
-
-        HttpResponse<String> httpResponse = null;
-        try {
-            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            logger.warn("Error connecting to Deckra-service");
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Deckra-service. Message - " + e.getMessage());
-        }
-
-        String response = httpResponse.body();*/
-
         String response = writeAndSendRequest(request, ipAddress, prefix);
 
         File file;
@@ -119,10 +99,7 @@ public class BaseController {
         catch (IOException e){
             logger.info("Error writing Output message to file.");
         }
-       /* finally {
-            writer.close();
-        }
-*/
+
         return response;
     }
 
@@ -132,7 +109,12 @@ public class BaseController {
         Writer writer = new StringWriter();
         saveXmlToWriter(request, writer);
         File file = Util.getFile(prefix, ".xml");
-        Files.writeString(file.toPath(), writer.toString());
+        try {
+            Files.writeString(file.toPath(), writer.toString());
+        } catch (IOException e) {
+            logger.warn("IOException при попытке записи в файл " + file.getPath());
+            throw new RuntimeException(e);
+        }
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(ipAddress))
@@ -145,8 +127,12 @@ public class BaseController {
         try {
             httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-            logger.warn("Error connecting to Deckra-service");
+            logger.warn("Error connecting to Dekra-service");
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Dekra-service. Message - " + e.getMessage());
+        }
+        if (httpResponse.statusCode() == 500) {
+            logger.warn("Status 500 at Dekra-service Response");
+            throw new DekraException("Status 500 at Dekra-service Response");
         }
 
         return httpResponse.body();

@@ -5,6 +5,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,29 +18,21 @@ public class FileDownloadService {
     public static WeakHashMap<Integer, File> fileStorage = new WeakHashMap<>();
     public static WeakHashMap<String, byte[]> byteArrStorage = new WeakHashMap<>();
 
-    private Path foundFile;
-
     public Resource getFileAsResource(String fileCode) throws IOException {
         Path dirPath = Paths.get("Files-Upload");
         if (!Files.exists(dirPath)) {
             Files.createDirectories(dirPath);
         }
+        Path foundFile = Files.list(dirPath)
+                .filter(file -> (file.getFileName().toString().startsWith(fileCode)))
+                .findFirst()
+                .orElse(null);
 
-        Files.list(dirPath).forEach(file -> {
-            if (file.getFileName().toString().startsWith(fileCode)) {
-                foundFile = file;
-                return;
-            }
-        });
-
-        if (foundFile != null) {
-            return new UrlResource(foundFile.toUri());
-        }
-
-        return null;
+        return foundFile != null ? new UrlResource(foundFile.toUri()) : null;
     }
 
-    public Resource getFileFromStorage(Integer fileCode) throws IOException {
+
+    public Resource getFileFromStorage(Integer fileCode) throws MalformedURLException {
 
         File found = fileStorage.get(fileCode);
 
@@ -58,8 +51,6 @@ public class FileDownloadService {
     public void deleteFromStorage (String fileName){
         byteArrStorage.remove(fileName);
     }
-
-
 
 
 

@@ -30,4 +30,11 @@ public class AppExceptionHandler {
         return ResponseEntity.badRequest().body(answer);
     }
 
+    @ExceptionHandler(DekraException.class)
+    public ResponseEntity<String> handleDekraExceptions (DekraException ex) {
+        String answer = String.format(TEXT_MISTAKE, ex.getMessage());
+        log.warn(answer);
+        return ResponseEntity.internalServerError().body(answer);
+    }
+
 }
