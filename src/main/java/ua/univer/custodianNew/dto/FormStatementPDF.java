@@ -11,6 +11,9 @@ public class FormStatementPDF extends FormStatementFile {
     @NotBlank
     private String orderId;
 
+    @NotBlank
+    private String fieldName;
+
     public FormStatementPDF() {
         this.setOutputFormat(0);
     }

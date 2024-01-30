@@ -239,10 +239,10 @@ public class BalanceController extends BaseController {
                 "login": "APIRest",
                 "password": "679271971e515557305cbb263e89e145",
                 "orderid": "%s",
-                "customorder_TestDekrafail": "%s",
+                "%s": "%s",
                 "fastdownload": 1
                 }
-                """.formatted(form.getOrderId(), customOrder);
+                """.formatted(form.getOrderId(), form.getFieldName(), customOrder);
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create("https://univer.1b.app/api/orders/update/?dataFromBody=1"))
@@ -251,20 +251,6 @@ public class BalanceController extends BaseController {
                 .build();
 
         httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-       /* HttpResponse<String> httpResponse;
-        try {
-            logger.info("before send to OneBox");
-            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            logger.info("after send to OneBox");
-        } catch (IOException | InterruptedException e) {
-            logger.warn("Error connecting to OneBox");
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to OneBox. Message - " + e.getMessage());
-        }
-
-        if (httpResponse.statusCode() != 200){
-            return ResponseEntity.internalServerError().body(httpResponse.body());
-        }*/
 
         logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
 
@@ -321,7 +307,8 @@ public class BalanceController extends BaseController {
                 "login": "APIRest",
                 "password": "679271971e515557305cbb263e89e145",
                 "orderid": "%s",
-                "customorder_TestDekrafail": "%s"
+                "customorder_TestDekrafail": "%s",
+                "fastdownload": 1
                 }
                 """.formatted(form.getOrderId(), customOrder);
 
