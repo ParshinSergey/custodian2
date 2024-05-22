@@ -16,7 +16,7 @@ public class SpringDocConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Custodian REST API documentation")
-                        .version("1.1.5")
+                        .version("1.1.6")
                         .description("REST API documentation"));
     }
 

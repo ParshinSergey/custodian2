@@ -21,4 +21,13 @@ public class ConverterUtil {
         return objectMapper.writeValueAsString(obj);
     }
 
+    public static <T> T jsonToObject(String json, Class<T> clas) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+        objectMapper.setDateFormat(df);
+
+        return objectMapper.readValue(json, clas);
+    }
+
 }

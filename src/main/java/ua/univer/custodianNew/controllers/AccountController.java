@@ -6,15 +6,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.xml.bind.Marshaller;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.univer.custodianNew.dto.FormFO;
 import ua.univer.custodianNew.dto.FormGet;
 import ua.univer.custodianNew.dto.FormReserveCancel;
+import ua.univer.custodianNew.util.ConverterUtil;
 
 import java.io.*;
 import java.net.http.HttpClient;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/request", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -188,13 +191,12 @@ public class AccountController extends BaseController {
     }
 
 
-    @Hidden
     @PostMapping(value = "/TEST/updateCustomer")
-    public ResponseEntity<String> testUpdateCustomer (@RequestBody @Valid FormFO form) throws IOException {
+    public ResponseEntity<String> testUpdateCustomer (@RequestBody FormFO form) throws IOException {
 
         long time = System.nanoTime();
 
-        Request request1 = getRequestWithHeader("Account", true);
+        /*Request request1 = getRequestWithHeader("Account", true);
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         var account = new TbodyRequest.Account();
@@ -203,10 +205,19 @@ public class AccountController extends BaseController {
         request1.setBody(tbodyRequest);
 
         String dekraResponse = writeAndSendRequestWriteResponseToFile(request1, DEKRA_URL_80, "Account");
-        Responce responce = getResponceFromXml(dekraResponse);
+        Responce responce = getResponceFromXml(dekraResponse);*/
+
+        String dekraResponse = testAccount(form.getAccount()).getBody();
+        Responce responce = ConverterUtil.jsonToObject(dekraResponse, Responce.class);
+        if (responce.getBody() == null){
+            return ResponseEntity.ok().body("Не найдено аккаунта " + form.getAccount());
+        }
         TCustomer customer = responce.getBody().getAccount().getCustomer();
 
         // check for equal INN
+        if (!customer.getIdCode().getValue().equals(form.getIdCode())){
+            return ResponseEntity.unprocessableEntity().body("Несоответствие ИНН и Account");
+        }
 
         Request request2 = getRequestWithHeader("UpdateCustomerV2", true);
         TbodyRequest tbodyRequest2 = new TbodyRequest();
@@ -216,6 +227,33 @@ public class AccountController extends BaseController {
 
         return getResponseEntity(time, request2, DEKRA_URL_80, "UpdateCustomer");
     }
+
+
+
+    @PostMapping(value = "/TEST/cancelBankDetail")
+    public ResponseEntity<String> testCancelBankDetail (@RequestBody FormFO form) throws IOException {
+
+        long time = System.nanoTime();
+
+        String dekraResponse = testAccount(form.getAccount()).getBody();
+        Responce responce = ConverterUtil.jsonToObject(dekraResponse, Responce.class);
+
+        if (responce.getBody() == null){
+            return ResponseEntity.ok().body("Не найдено аккаунта " + form.getAccount());
+        }
+        TCustomer customer = responce.getBody().getAccount().getCustomer();
+
+        Request request = getRequestWithHeader("UpdateCustomerV2", true);
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        TupdateCustomer updCustomer = Util.cancelBankDetail(customer, form);
+        tbodyRequest.setUpdateCustomer(updCustomer);
+        request.setBody(tbodyRequest);
+
+        return getResponseEntity(time, request, DEKRA_URL_80, "UpdateCustomer");
+    }
+
+
+
 
 
     @Operation(summary = "Анкета рахунку у ЦБ")
@@ -234,6 +272,26 @@ public class AccountController extends BaseController {
         return getResponseEntity(time, request, DEKRA_URL_PROD, "Account");
 
     }
+
+    @Hidden
+    @PostMapping(value = "/TEST/account", consumes = "*/*")
+    public ResponseEntity<String> testAccount (@RequestBody @NotBlank String accountNum) throws IOException {
+        long time = System.nanoTime();
+
+        Request request = getRequestWithHeader("Account", true);
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        var account = new TbodyRequest.Account();
+        account.setAccount(accountNum);
+        tbodyRequest.setAccount(account);
+        request.setBody(tbodyRequest);
+
+        return getResponseEntity(time, request, DEKRA_URL_80, "Account");
+
+    }
+
+
+
 
 }
 

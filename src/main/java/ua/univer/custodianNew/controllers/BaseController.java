@@ -132,6 +132,9 @@ public class BaseController {
         }
         if (httpResponse.statusCode() == 500) {
             logger.warn("Status 500 at Dekra-service Response");
+            if(httpResponse.body() != null){
+                logger.warn(httpResponse.body());
+            }
             throw new DekraException("Status 500 at Dekra-service Response");
         }
 

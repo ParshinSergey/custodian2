@@ -541,5 +541,29 @@ public final class Util {
         }
     }
 
+    public static TupdateCustomer cancelBankDetail(TCustomer customer, FormFO form) {
+
+        TupdateCustomer updateCustomer = new TupdateCustomer();
+        updateCustomer.setAccount(form.getAccount());
+        updateCustomer.setCustomerID(customer.getCustomerID());
+
+        TBankDetail newRekv = new TBankDetail();
+        List<TBankDetail> originListBankDetail = customer.getBankDetails().getBankDetail();
+        for (TBankDetail tBankDetail : originListBankDetail) {
+            if (form.getIban().trim().equalsIgnoreCase(tBankDetail.getIBAN())) {
+                TBankDetail.Period period = tBankDetail.getPeriod();
+                period.setDateStop(xmlGregorianCalendar(LocalDateTime.now()));
+                tBankDetail.setPeriod(period);
+                tBankDetail.setChanged(true);
+                newRekv = tBankDetail;
+                break;
+            }
+        }
+        var bankDetails = new TupdateCustomer.BankDetails();
+        bankDetails.getBankDetail().add(newRekv);
+        updateCustomer.setBankDetails(bankDetails);
+
+        return updateCustomer;
+    }
 }
 
