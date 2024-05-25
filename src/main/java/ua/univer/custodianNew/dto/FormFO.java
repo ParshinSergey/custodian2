@@ -1,6 +1,7 @@
 package ua.univer.custodianNew.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -157,6 +158,16 @@ public class FormFO {
     private String brokerAgreementDateStop;
     private Integer brokerAgrID;
 
+    // поля для Юридических лиц
+    private String shortNameInternational;
+    private String longNameInternational;
+    private float fund;
+    private String currencyFund;
+    private String form;
+
+    // поле для работы Тестовых Методов
+    @Hidden
+    private boolean test;
 
 
     public FormFO() {

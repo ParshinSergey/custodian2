@@ -421,25 +421,34 @@ public final class Util {
         result.setName(name);
 
         // Меняется только adressFree. Чтобы не затирать в Декре дома, улицы и т.п.
-        List<Taddress> address = origin.getAddresses().getAddress();
-        for (Taddress taddress : address) {
-            if (taddress.getAddressType() == TAddressType.LEGAL){
-
-           /*     String phrase = "фактична адреса згідно довідки ВПО";
-                String[] arrAddress = updated.getAddressFree().split(phrase, 2);*/
-
-                String updatedAddressFree = form.getAddressFree();
-                if(updatedAddressFree != null && !updatedAddressFree.trim().equalsIgnoreCase(taddress.getAddressFree())){
-                    var addressesRes = new TupdateCustomer.Addresses();
-                    Taddress addressRes = new Taddress();
-                    addressRes.setAddressType(TAddressType.LEGAL);
-                    addressRes.setAddressFree(updatedAddressFree.trim());
-                    addressRes.setAddressID(BigInteger.valueOf(-1));
-                    addressRes.setChanged(true);
-                    addressesRes.getAddress().add(addressRes);
-                    result.setAddresses(addressesRes);
+        if (form.getAddressFree() != null){
+            String phrase = "фактична адреса згідно довідки ВПО";
+            String[] arrAddress = form.getAddressFree().split(phrase, 2);
+            List<Taddress> listAddress = origin.getAddresses().getAddress();
+            var addressesRes = new TupdateCustomer.Addresses();
+            boolean find = false;
+            for (Taddress taddress : listAddress) {
+                if (taddress.getAddressType() == TAddressType.LEGAL && !taddress.getAddressFree().equals(arrAddress[0].trim())) {
+                    Taddress address = new Taddress();
+                    address.setAddressType(TAddressType.LEGAL);
+                    address.setAddressFree(arrAddress[0].trim());
+                    address.setAddressID(BigInteger.valueOf(-1));
+                    address.setChanged(true);
+                    addressesRes.getAddress().add(address);
+                }
+                if (arrAddress.length > 1 && taddress.getAddressType() == TAddressType.POST && taddress.getAddressFree().equals(phrase + " " + arrAddress[1].trim())) {
+                    find = true;
                 }
             }
+            if ( arrAddress.length > 1 && !find ){
+                Taddress address = new Taddress();
+                address.setAddressType(TAddressType.POST);
+                address.setAddressFree(phrase + " " + arrAddress[1].trim());
+                address.setAddressID(BigInteger.valueOf(-1));
+                address.setChanged(true);
+                addressesRes.getAddress().add(address);
+            }
+            result.setAddresses(addressesRes);
         }
 
         String updatedDocNumber = form.getDocNumber();
@@ -554,6 +563,7 @@ public final class Util {
                 TBankDetail.Period period = tBankDetail.getPeriod();
                 period.setDateStop(xmlGregorianCalendar(LocalDateTime.now()));
                 tBankDetail.setPeriod(period);
+                tBankDetail.setUse4Income(false);
                 tBankDetail.setChanged(true);
                 newRekv = tBankDetail;
                 break;

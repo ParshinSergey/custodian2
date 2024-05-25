@@ -19,6 +19,8 @@ import java.io.*;
 import java.net.http.HttpClient;
 import java.util.List;
 
+import static ua.univer.custodianNew.exceptions.AppExceptionHandler.TEXT_MISTAKE;
+
 @RestController
 @RequestMapping(value = "/api/request", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController extends BaseController {
@@ -239,7 +241,10 @@ public class AccountController extends BaseController {
         Responce responce = ConverterUtil.jsonToObject(dekraResponse, Responce.class);
 
         if (responce.getBody() == null){
-            return ResponseEntity.ok().body("Не найдено аккаунта " + form.getAccount());
+            String answer = String.format(TEXT_MISTAKE, "Не найдено аккаунта " + form.getAccount());
+            logger.warn(answer);
+            return ResponseEntity.unprocessableEntity().body(answer);
+           // return ResponseEntity.ok().body("Не найдено аккаунта " + form.getAccount());
         }
         TCustomer customer = responce.getBody().getAccount().getCustomer();
 

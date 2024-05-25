@@ -13,7 +13,7 @@ import java.time.format.DateTimeParseException;
 @Slf4j
 public class AppExceptionHandler {
 
-    private final static String TEXT_MISTAKE = "{\"textmistake\": \"%s\"}";
+    public final static String TEXT_MISTAKE = "{\"textmistake\": \"%s\"}";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationExceptions (MethodArgumentNotValidException ex) {
