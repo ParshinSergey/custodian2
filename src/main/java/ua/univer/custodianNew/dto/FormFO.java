@@ -165,10 +165,6 @@ public class FormFO {
     private String currencyFund;
     private String form;
 
-    // поле для работы Тестовых Методов
-    @Hidden
-    private boolean test;
-
 
     public FormFO() {
     }
