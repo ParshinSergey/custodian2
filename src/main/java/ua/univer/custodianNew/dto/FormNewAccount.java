@@ -10,7 +10,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class FormFO {
+public class FormNewAccount extends BaseForm{
 
     @NotBlank
     @DecimalMax(value = "100000000")
@@ -18,6 +18,7 @@ public class FormFO {
 
     private String account;
 
+    @NotBlank
     @Pattern(regexp = "^\\d{3}$", message = "должно состоять из трех цифр")
     private String nssmcClientTypeCode;
 
@@ -161,16 +162,16 @@ public class FormFO {
     // поля для Юридических лиц
     private String shortNameInternational;
     private String longNameInternational;
-    private float fund;
+    private double fund;
     private String currencyFund;
-    private String form;
+    private String kopf;
 
-    // поле для работы Тестовых Методов
+   /* // поле для работы Тестовых Методов
     @Hidden
-    private boolean test;
+    private boolean test;*/
 
 
-    public FormFO() {
+    public FormNewAccount() {
     }
 
     public String geteMailGeneral() {

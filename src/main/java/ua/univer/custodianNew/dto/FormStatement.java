@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FormStatement {
+public class FormStatement extends BaseForm{
 
     @NotBlank
     private String dateStart;

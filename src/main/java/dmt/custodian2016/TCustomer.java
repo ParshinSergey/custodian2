@@ -20,6 +20,8 @@ import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlSeeAlso;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import ua.univer.custodianNew.util.DoubleAdapter;
 
 
 /**
@@ -1456,7 +1458,8 @@ public class TCustomer {
     public static class Fund {
 
         @XmlValue
-        protected float value;
+        @XmlJavaTypeAdapter(DoubleAdapter.class)
+        protected Double value;
         @XmlAttribute(name = "changed")
         protected Boolean changed;
 
@@ -1464,7 +1467,7 @@ public class TCustomer {
          * Gets the value of the value property.
          * 
          */
-        public float getValue() {
+        public Double getValue() {
             return value;
         }
 
@@ -1472,7 +1475,7 @@ public class TCustomer {
          * Sets the value of the value property.
          * 
          */
-        public void setValue(float value) {
+        public void setValue(Double value) {
             this.value = value;
         }
 

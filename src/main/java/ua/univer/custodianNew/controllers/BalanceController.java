@@ -24,9 +24,14 @@ import static ua.univer.custodianNew.util.FileDownloadService.byteArrStorage;
 @RequestMapping(value = "/api/balance", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class BalanceController extends BaseController {
 
-    private final static int OUTPUT_FORMAT_PDF = 0;
-    private final static int STATEMENT_TEMPLATE = 191;
-    private final static int STATEMENT_TEMPLATE_WITH_FACSIMILE = 204;
+    private static final String BALANCE_V2 = "BalanceV2";
+    private static final String STATEMENT_OF_HOLDINGS_V2 = "Statement_of_HoldingsV2";
+    private static final String STATEMENT_OF_TRANSACTION = "Statement_of_Transaction";
+    private static final String STATEMENT_OF_TRANSACTION_V2 = "Statement_of_TransactionV2";
+
+    private static final int OUTPUT_FORMAT_PDF = 0;
+    private static final int STATEMENT_TEMPLATE = 191;
+    private static final int STATEMENT_TEMPLATE_WITH_FACSIMILE = 204;
 
     public BalanceController(Marshaller marshaller, HttpClient httpClient) {
         super(marshaller, httpClient);
@@ -34,10 +39,12 @@ public class BalanceController extends BaseController {
 
 
     @PostMapping(value = "/TEST/account")
-    public ResponseEntity<String> balanceAccount(@RequestBody @Valid FormBalance form) throws IOException {
+    public ResponseEntity<String> balanceAccount(@RequestBody @Valid FormBalance form) {
 
+        form.setTest(true);
         long time = System.nanoTime();
-        Request request = getRequestWithHeader("BalanceV2", true);
+        String methodName = BALANCE_V2;
+        Request request = getRequestWithHeader(methodName, form.isTest());
 
         TBalanceRequest balance = new TBalanceRequest();
         balance.setAccount(form.getAccount());
@@ -54,16 +61,18 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_80,"Balance");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
     @Operation(summary = "Виписка про стан рахунку (V2)")
     @PostMapping(value = "/accountV2", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> balanceAccV2(@RequestBody @Valid FormBalance form) throws IOException {
+    public ResponseEntity<String> balanceAccV2(@RequestBody @Valid FormBalance form) {
 
         long time = System.nanoTime();
-        Request request = getRequestWithHeader("Statement_of_HoldingsV2", false);
+        String methodName = STATEMENT_OF_HOLDINGS_V2;
+        //String ipAddress = form.isTest()? DEKRA_URL_80 : DEKRA_URL_PROD;
+        Request request = getRequestWithHeader(methodName, form.isTest());
 
         TStatementOfHoldingsRequest statement = new TStatementOfHoldingsRequest();
         statement.setAccount(form.getAccount());
@@ -80,15 +89,18 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_PROD, "Statement");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
     @PostMapping(value = "/TEST/statementV2")
-    public ResponseEntity<String> statementV2(@RequestBody @Valid FormStatement form) throws IOException {
+    public ResponseEntity<String> statementV2(@RequestBody @Valid FormStatement form) {
 
+        form.setTest(true);
         long time = System.nanoTime();
-        Request request = getRequestWithHeader("Statement_of_TransactionV2", true);
+        String methodName = STATEMENT_OF_TRANSACTION_V2;
+        //String ipAddress = form.isTest()? DEKRA_URL_80 : DEKRA_URL_PROD;
+        Request request = getRequestWithHeader(methodName, form.isTest());
 
         TStatementOfTransactionsRequest statement = new TStatementOfTransactionsRequest();
 
@@ -107,61 +119,29 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_80, "Statement");
-
-    }
-
-
-    @PostMapping(value = "/statementBinary")
-    public ResponseEntity<String> statementBinary(@RequestBody @Valid FormStatementFile form) throws IOException {
-
-        logger.info("Statement_of_Transaction. Binary. Production");
-        long time = System.nanoTime();
-
-        Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
-        tHeaderRequest.setRequestType("Statement_of_Transaction");
-        var binary = new THeaderRequest.Binary();
-        binary.setBinary(true);
-        binary.setTemplate(STATEMENT_TEMPLATE);
-        binary.setOutputFormat(form.getOutputFormat().compareTo(-1) == 0 ? 0 : form.getOutputFormat());
-        tHeaderRequest.setBinary(binary);
-        request.setHeader(tHeaderRequest);
-
-        TStatementOfTransactionsRequest statement = new TStatementOfTransactionsRequest();
-
-        statement.setAccount(form.getAccount());
-        if (form.getIsin() != null) {
-            var tisin = new TISIN();
-            tisin.setISIN(form.getIsin());
-            tisin.setDepositary(form.getDepositary());
-            statement.setISIN(tisin);
-        }
-        statement.setDateStart(DateTimeUtil.oneBoxCalendar(form.getDateStart()));
-        statement.setDateStop(DateTimeUtil.oneBoxCalendar(form.getDateStop()));
-
-        TbodyRequest tbodyRequest = new TbodyRequest();
-        tbodyRequest.setStatementOfTransactionsRequest(statement);
-
-        request.setBody(tbodyRequest);
-
-        return getResponseEntity(time, request, DEKRA_URL_PROD, "StatementBinary");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
 
     }
 
 
     @PostMapping(value = "/TEST/statementBinary")
     public ResponseEntity<String> testStatementBinary(@RequestBody @Valid FormStatementFile form) throws IOException {
+        form.setTest(true);
+        return statementBinary(form);
+    }
 
-        logger.info("Statement_of_Transaction. Binary. TEST.");
+
+    @PostMapping(value = "/statementBinary")
+    public ResponseEntity<String> statementBinary(@RequestBody @Valid FormStatementFile form) {
+
         long time = System.nanoTime();
+        String methodName = STATEMENT_OF_TRANSACTION;
+        logger.info("Method %s. Binary. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
-        tHeaderRequest.setRequestType("Statement_of_Transaction");
-        // tHeaderRequest.setSourceAPPidentity("3000350A-429D-4632-81B7-B31C02C7D980");
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.isTest());
+        tHeaderRequest.setRequestType(methodName);
         var binary = new THeaderRequest.Binary();
         binary.setBinary(true);
         binary.setTemplate(STATEMENT_TEMPLATE);
@@ -186,21 +166,24 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_80, "StatementBinary");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
 
     }
 
+
     @Operation(summary = "Виписка про операції у форматі PDF")
     @PostMapping(value = "/statementPDF")
-    public ResponseEntity<String> statementPDF(@RequestBody @Valid FormStatementPDF form) throws IOException {
+    public ResponseEntity<String> statementPDF(@RequestBody @Valid FormStatementPDF form) {
 
-        logger.info("Statement_of_Transaction. statementPDF. Production");
+        //logger.info("Statement_of_Transaction. statementPDF. Production");
         long time = System.nanoTime();
+        String methodName = STATEMENT_OF_TRANSACTION;
+        logger.info("Method %s. StatementPDF. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest();
-        tHeaderRequest.setRequestType("Statement_of_Transaction");
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.isTest());
+        tHeaderRequest.setRequestType(methodName);
         var binary = new THeaderRequest.Binary();
         binary.setBinary(true);
         binary.setTemplate(STATEMENT_TEMPLATE_WITH_FACSIMILE);
@@ -225,7 +208,7 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequest(request, DEKRA_URL_PROD, "StatementPDF");
+        String dekraResponse = writeAndSendRequest(request, form.ipAddress(), "StatementPDF");
         Responce responce = getResponceFromXml(dekraResponse);
         String b64 = responce.getBody().getBinary();
 
@@ -260,15 +243,17 @@ public class BalanceController extends BaseController {
 
 
     @PostMapping(value = "/TEST/getStatementPDF")
-    public ResponseEntity<String> getStatementPDF(@RequestBody @Valid FormStatementPDF form) throws IOException {
+    public ResponseEntity<String> getStatementPDF(@RequestBody @Valid FormStatementPDF form) {
 
-        logger.info("Statement_of_Transaction. getStatementPDF. TEST");
+        form.setTest(true);
         long time = System.nanoTime();
+        String methodName = STATEMENT_OF_TRANSACTION;
+        logger.info("Method %s. getStatementPDF. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest();
-        tHeaderRequest.setRequestType("Statement_of_Transaction");
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.isTest());
+        tHeaderRequest.setRequestType(methodName);
         var binary = new THeaderRequest.Binary();
         binary.setBinary(true);
         binary.setTemplate(STATEMENT_TEMPLATE);
@@ -293,7 +278,7 @@ public class BalanceController extends BaseController {
 
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_80, "getStatementPDF");
+        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, form.ipAddress(), methodName);
         Responce responce = getResponceFromXml(dekraResponse);
         String b64 = responce.getBody().getBinary();
 
@@ -338,28 +323,6 @@ public class BalanceController extends BaseController {
 
     }
 
-
-/*
-    private static String answer(Responce responce) {
-        TStatementOfHoldingRowsV2 rows = (TStatementOfHoldingRowsV2) responce.getBody().getBalance().getRows();
-        StringBuilder sb = new StringBuilder();
-        List<TStatementOfHoldingRowV2> row = rows.getRow();
-        for (var item : row) {
-            sb.append("ISIN " + item.getISIN().getISIN() + "\n")
-                    .append("Depositary " + item.getISIN().getDepositary() + "\n")
-                    .append("ShortName " + item.getISIN().getIssuer().getShortName() + "\n" )
-                    .append("IDCode " + item.getISIN().getIssuer().getIDCode() + "\n")
-                    .append("Code " + item.getISIN().getType().getCode() + "\n")
-                    .append("Name " + item.getISIN().getType().getName() + "\n")
-                    .append("Nominal " + item.getISIN().getNominal().getNominal() + "\n")
-                    .append("Currency " + item.getISIN().getNominal().getCurrency() + "\n")
-
-                    .append("Quantity " + item.getQuantity() + "\n")
-                    .append("faceAmount " + item.getFaceAmount() + "\n")
-                    .append("\n");
-        }
-        return sb.toString();
-    }*/
 
 }
 

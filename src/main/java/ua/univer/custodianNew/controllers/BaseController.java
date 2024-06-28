@@ -46,8 +46,7 @@ public class BaseController {
         logger.info("Method %s. %s".formatted(methodName, isTest ? "TEST" : "Production"));
 
         Request request = new Request();
-
-        THeaderRequest tHeaderRequest = isTest ? Util.getHeaderRequestTest() : Util.getHeaderRequest();
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest(isTest);
         tHeaderRequest.setRequestType(methodName);
         request.setHeader(tHeaderRequest);
 
@@ -87,51 +86,39 @@ public class BaseController {
         }
     }
 
-    protected String writeAndSendRequestWriteResponseToFile(Request request, String ipAddress, String prefix) throws IOException {
+    protected String writeAndSendRequestWriteResponseToFile(Request request, String ipAddress, String prefix) {
 
         String response = writeAndSendRequest(request, ipAddress, prefix);
-
-        File file;
-        try {
-            file = Util.getFile("Response", ".xml");
-            Files.writeString(file.toPath(), response);
-        }
-        catch (IOException e){
-            logger.info("Error writing Output message to file.");
-        }
+        Util.writeStringToFile(response, "Response", ".xml");
 
         return response;
     }
 
 
-    protected String writeAndSendRequest(Request request, String ipAddress, String prefix) throws IOException {
+    protected String writeAndSendRequest(Request request, String ipAddress, String prefix) {
 
-        Writer writer = new StringWriter();
-        saveXmlToWriter(request, writer);
-        File file = Util.getFile(prefix, ".xml");
-        try {
-            Files.writeString(file.toPath(), writer.toString());
+        String xmlString;
+        try (Writer writer = new StringWriter()) {
+            saveXmlToWriter(request, writer);
+            xmlString = writer.toString();
         } catch (IOException e) {
-            logger.warn("IOException при попытке записи в файл " + file.getPath());
-            throw new RuntimeException(e);
+            throw new DekraException("IOException in method writeAndSendRequest " + e.getMessage());
         }
+        Util.writeStringToFile(xmlString, prefix, ".xml");
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(ipAddress))
-                .POST(HttpRequest.BodyPublishers.ofString(writer.toString()))
+                .POST(HttpRequest.BodyPublishers.ofString(xmlString))
                 .header("Content-Type", "application/xml")
                 .build();
-        writer.close();
 
         HttpResponse<String> httpResponse;
         try {
             httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-            logger.warn("Error connecting to Dekra-service");
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Error connecting to Dekra-service. Message - " + e.getMessage());
+            throw new DekraException("Error connecting to Dekra-service. Message - " + e.getMessage());
         }
         if (httpResponse.statusCode() == 500) {
-            logger.warn("Status 500 at Dekra-service Response");
             if(httpResponse.body() != null){
                 logger.warn(httpResponse.body());
             }
@@ -143,25 +130,20 @@ public class BaseController {
 
 
     protected Responce getResponceFromXml(String dekraResponse) {
-        StringReader reader = new StringReader(dekraResponse);
-
-        Responce responce = null;
-        try {
+        Responce responce;
+        try(StringReader reader = new StringReader(dekraResponse)){
             responce = (Responce) unmarshaller.unmarshal(reader);
-        } catch (JAXBException e) {
-            logger.warn("Error unmarshalling");
         }
-        finally {
-            reader.close();
+        catch (JAXBException e) {
+            throw new DekraException("Error unmarshalling. DekraResponse is: " + dekraResponse);
         }
         return responce;
     }
 
 
-    protected ResponseEntity<String> getResponseEntity(long time, Request request, String ipAddress, String methodName) throws IOException {
+    protected ResponseEntity<String> getResponseEntity(long time, Request request, String ipAddress, String methodName) {
         String dekraResponse = writeAndSendRequestWriteResponseToFile(request, ipAddress, methodName);
         Responce responce = getResponceFromXml(dekraResponse);
-       // String jsonResponse = ConverterUtil.objectToJson(responce);
         if (responce == null) {
             logger.warn("Произошла ошибка " + dekraResponse);
             return ResponseEntity.internalServerError().body("Произошла ошибка " + dekraResponse);

@@ -21,6 +21,7 @@ import static ua.univer.custodianNew.util.DateTimeUtil.oneBoxCalendar;
 @RequestMapping(value = "/api", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class TransactionController extends BaseController{
 
+    private static final String TRANSACTION = "Transaction";
 
     public TransactionController(Marshaller marshaller, HttpClient httpClient) {
         super(marshaller, httpClient);
@@ -28,10 +29,12 @@ public class TransactionController extends BaseController{
 
     //@Operation(summary = "Выполнение транзакции")
     @PostMapping(value = "/TEST/transaction")
-    public ResponseEntity<String> transaction(@RequestBody FormTransaction form) throws IOException {
+    public ResponseEntity<String> transaction(@RequestBody FormTransaction form) {
 
+        form.setTest(true);
         long time = System.nanoTime();
-        Request request = getRequestWithHeader("Transaction", true);
+        String methodName = TRANSACTION;
+        Request request = getRequestWithHeader(methodName, form.isTest());
        /* logger.info("Method Transaction.");
         long time = System.nanoTime();
 
@@ -101,7 +104,7 @@ public class TransactionController extends BaseController{
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_80,"transaction");
+        return getResponseEntity(time, request, form.ipAddress(),methodName);
 
     }
 

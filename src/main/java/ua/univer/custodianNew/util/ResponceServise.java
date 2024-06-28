@@ -13,8 +13,6 @@ public class ResponceServise {
     }
 
     public static Responce getResponceWithBroker(Responce responce, String brokerID){
-       /* Responce result = new Responce();
-        result.setHeader(responce.getHeader());*/
 
         TAccountListV2Full listV2Full = new TAccountListV2Full();
         TAccountListV2Full rows = (TAccountListV2Full) responce.getBody().getAccountListV2().getRows();

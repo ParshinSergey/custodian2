@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FormSearchCustomer {
+public class FormSearchCustomer extends BaseForm{
 
     private String name;
 

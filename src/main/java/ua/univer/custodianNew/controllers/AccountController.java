@@ -4,20 +4,17 @@ import dmt.custodian2016.*;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.xml.bind.Marshaller;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.univer.custodianNew.dto.FormFO;
+import ua.univer.custodianNew.dto.FormAccount;
+import ua.univer.custodianNew.dto.FormNewAccount;
 import ua.univer.custodianNew.dto.FormGet;
-import ua.univer.custodianNew.dto.FormReserveCancel;
 import ua.univer.custodianNew.util.ConverterUtil;
 
 import java.io.*;
 import java.net.http.HttpClient;
-import java.util.List;
 
 import static ua.univer.custodianNew.exceptions.AppExceptionHandler.TEXT_MISTAKE;
 
@@ -25,111 +22,81 @@ import static ua.univer.custodianNew.exceptions.AppExceptionHandler.TEXT_MISTAKE
 @RequestMapping(value = "/api/request", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController extends BaseController {
 
-    private final static String NEW_ACCOUNT = "newAccount";
+    private static final String NEW_ACCOUNT = "newAccount";
+    private static final String GET_ACCOUNT_NUM = "GetAccountNum";
+    private static final String UPDATE_CUSTOMER = "UpdateCustomerV2";
+    private static final String ACCOUNT = "Account";
+    private static final String ACCOUNT_NUM_RESERVE_CANCEL ="AccountNumReserveCancel";
 
     public AccountController(Marshaller marshaller, HttpClient httpClient) {
         super(marshaller, httpClient);
     }
 
 
-    @PostMapping(value = "/TEST/" + NEW_ACCOUNT + "FO")
-    public ResponseEntity<String> testGetNewAccountFO (@RequestBody @Valid FormFO form) throws IOException {
+    @PostMapping(value = "/TEST/" + NEW_ACCOUNT)
+    public ResponseEntity<String> testNewAccount (@RequestBody @Valid FormNewAccount form) {
+        form.setTest(true);
+        return newAccount(form);
+    }
 
-        logger.info("Method NewAccount. TEST.");
+
+    @Operation(summary = "Відкриття рахунку")
+    @PostMapping(value = "/newAccount")
+    public ResponseEntity<String> newAccount (@RequestBody @Valid FormNewAccount form) {
+
         long time = System.nanoTime();
+
+        String methodName = NEW_ACCOUNT;
+        logger.info("Method %s. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequestTest(form.getRequestID());
-        tHeaderRequest.setRequestType(NEW_ACCOUNT);
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.getRequestID(), form.isTest());
+        tHeaderRequest.setRequestType(methodName);
         request.setHeader(tHeaderRequest);
 
         TbodyRequest tbodyRequest = Util.convertFormToNewAccount(form);
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_80, "NewAccountTEST");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
     @Operation(summary = "Відкриття рахунку")
     @PostMapping(value = "/" + NEW_ACCOUNT + "FO")
-    public ResponseEntity<String> getNewAccountFO (@RequestBody @Valid FormFO form) throws IOException {
+    public ResponseEntity<String> getNewAccountFO (@RequestBody @Valid FormNewAccount form) {
 
         logger.info("Method NewAccount. Production");
         long time = System.nanoTime();
+        String methodName = NEW_ACCOUNT;
 
         Request request = new Request();
 
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.getRequestID());
-        tHeaderRequest.setRequestType(NEW_ACCOUNT);
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.getRequestID(), form.isTest());
+        tHeaderRequest.setRequestType(methodName);
         request.setHeader(tHeaderRequest);
 
         TbodyRequest tbodyRequest = Util.convertFormToNewAccount(form);
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_PROD, "NewAccount");
-
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
     @PostMapping(value = "/TEST/getAccount")
-    public ResponseEntity<String> testGetAccount (@RequestBody @Valid FormGet form) throws IOException {
-
-        long time = System.nanoTime();
-        Request request = getRequestWithHeader("GetAccountNum", true);
-
-        TAccountNumRequest accountNumRequest = new TAccountNumRequest();
-
-        var nssmc = new TAccountNumRequest.NssmcClientTypeCode();
-        nssmc.setValue(form.getNssmcClientTypeCode());
-        accountNumRequest.setNssmcClientTypeCode(nssmc);
-
-        var cnum = new TAccountNumRequest.CNUM();
-        cnum.setValue(form.getCnum());
-        accountNumRequest.setCNUM(cnum);
-
-        var typeCode = new TAccountNumRequest.ClientTypeCode();
-        typeCode.setValue("-1".equals(form.getClientTypeCode()) ? "0" : form.getClientTypeCode());
-        accountNumRequest.setClientTypeCode(typeCode);
-
-        var country = new TAccountNumRequest.Country();
-        country.setValue(form.getCountry());
-        accountNumRequest.setCountry(country);
-
-        TbodyRequest tbodyRequest = new TbodyRequest();
-        tbodyRequest.setAccountNum(accountNumRequest);
-        request.setBody(tbodyRequest);
-
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_80, "GetAccountTEST");
-
-        Responce responce = getResponceFromXml(deckraResponse);
-
-        if (responce == null) {
-            return ResponseEntity.internalServerError().body("Произошла ошибка " + deckraResponse);
-        } else {
-            if ("Error".equalsIgnoreCase(responce.getHeader().getResponceType())){
-                String answer = String.format("{\"textmistake\": \"%s\"}", responce.getBody().getStatus().getMessage());
-                return ResponseEntity.badRequest().body(answer);
-            }
-            else {
-                String accountNum = responce.getBody().getAccountNum().trim();
-                int length = accountNum.length();
-                String lastSymbols = accountNum.substring(length-6, length);
-                String answer = String.format("{\"account_bill\": \"%s\", \"last_symbols\":\"%s\", \"CNUM\":\"%s\"}", accountNum, lastSymbols, form.getCnum());
-                logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
-                return ResponseEntity.ok().body(answer);
-            }
-        }
-
+    public ResponseEntity<String> testGetAccount (@RequestBody @Valid FormGet form) {
+        form.setTest(true);
+        return getAccountNum(form);
     }
 
 
     @Operation(summary = "Запит номера рахунку")
     @PostMapping(value = "/getAccountNum")
-    public ResponseEntity<String> getAccountNum (@RequestBody @Valid FormGet form) throws IOException {
+    public ResponseEntity<String> getAccountNum (@RequestBody @Valid FormGet form) {
 
         long time = System.nanoTime();
-        Request request = getRequestWithHeader("GetAccountNum", false);
+        String methodName = GET_ACCOUNT_NUM;
+        Request request = getRequestWithHeader(methodName, form.isTest());
 
         TAccountNumRequest accountNumRequest = new TAccountNumRequest();
 
@@ -153,7 +120,7 @@ public class AccountController extends BaseController {
         tbodyRequest.setAccountNum(accountNumRequest);
         request.setBody(tbodyRequest);
 
-        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_PROD, "GetAccountNum");
+        String deckraResponse = writeAndSendRequestWriteResponseToFile(request, form.ipAddress(), methodName);
 
         Responce responce = getResponceFromXml(deckraResponse);
 
@@ -176,40 +143,37 @@ public class AccountController extends BaseController {
     }
 
 
-
-
     @Operation(summary = "Скасування резервування номера рахунку")
     @PostMapping(value = "/accountReserveCancel")
-    public ResponseEntity<String> accountReserveCancel (@RequestBody @Valid FormReserveCancel form) throws IOException {
+    public ResponseEntity<String> accountReserveCancel (@RequestBody @Valid FormAccount form) {
 
         long time = System.nanoTime();
-        Request request = getRequestWithHeader("AccountNumReserveCancel", false);
+        String methodName = ACCOUNT_NUM_RESERVE_CANCEL;
+        Request request = getRequestWithHeader(methodName, form.isTest());
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setAccountNumReserveCancel(form.getAccount());
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_PROD, "ReserveCancel");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
     @PostMapping(value = "/TEST/updateCustomer")
-    public ResponseEntity<String> testUpdateCustomer (@RequestBody FormFO form) throws IOException {
+    public ResponseEntity<String> testUpdateCustomer (@RequestBody FormNewAccount form) {
+        form.setTest(true);
+        return updateCustomer(form);
+    }
+
+
+    @Operation(summary = "Редагування картки клієнта")
+    @PostMapping(value = "/updateCustomer")
+    public ResponseEntity<String> updateCustomer (@RequestBody FormNewAccount form) {
 
         long time = System.nanoTime();
+        String methodName = UPDATE_CUSTOMER;
 
-        /*Request request1 = getRequestWithHeader("Account", true);
-
-        TbodyRequest tbodyRequest = new TbodyRequest();
-        var account = new TbodyRequest.Account();
-        account.setAccount(form.getAccount());
-        tbodyRequest.setAccount(account);
-        request1.setBody(tbodyRequest);
-
-        String dekraResponse = writeAndSendRequestWriteResponseToFile(request1, DEKRA_URL_80, "Account");
-        Responce responce = getResponceFromXml(dekraResponse);*/
-
-        String dekraResponse = testAccount(form.getAccount()).getBody();
+        String dekraResponse = account(new FormAccount(form.getAccount(), form.isTest())).getBody();
         Responce responce = ConverterUtil.jsonToObject(dekraResponse, Responce.class);
         if (responce.getBody() == null){
             return ResponseEntity.ok().body("Не найдено аккаунта " + form.getAccount());
@@ -221,23 +185,31 @@ public class AccountController extends BaseController {
             return ResponseEntity.unprocessableEntity().body("Несоответствие ИНН и Account");
         }
 
-        Request request2 = getRequestWithHeader("UpdateCustomerV2", true);
+        Request request = getRequestWithHeader(methodName, form.isTest());
         TbodyRequest tbodyRequest2 = new TbodyRequest();
         TupdateCustomer updCustomer = Util.makeCustomerForUpdate(customer, form);
         tbodyRequest2.setUpdateCustomer(updCustomer);
-        request2.setBody(tbodyRequest2);
+        request.setBody(tbodyRequest2);
 
-        return getResponseEntity(time, request2, DEKRA_URL_80, "UpdateCustomer");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
-
     @PostMapping(value = "/TEST/cancelBankDetail")
-    public ResponseEntity<String> testCancelBankDetail (@RequestBody FormFO form) throws IOException {
+    public ResponseEntity<String> testCancelBankDetail (@RequestBody FormNewAccount form) {
+        form.setTest(true);
+        return cancelBankDetail(form);
+    }
+
+
+    @Operation(summary = "Скасування банківських реквізитів")
+    @PostMapping(value = "/cancelBankDetail")
+    public ResponseEntity<String> cancelBankDetail (@RequestBody FormNewAccount form) {
 
         long time = System.nanoTime();
+        String methodName = UPDATE_CUSTOMER;
 
-        String dekraResponse = testAccount(form.getAccount()).getBody();
+        String dekraResponse = account(new FormAccount(form.getAccount(), form.isTest())).getBody();
         Responce responce = ConverterUtil.jsonToObject(dekraResponse, Responce.class);
 
         if (responce.getBody() == null){
@@ -248,55 +220,40 @@ public class AccountController extends BaseController {
         }
         TCustomer customer = responce.getBody().getAccount().getCustomer();
 
-        Request request = getRequestWithHeader("UpdateCustomerV2", true);
+        Request request = getRequestWithHeader(methodName, form.isTest());
         TbodyRequest tbodyRequest = new TbodyRequest();
         TupdateCustomer updCustomer = Util.cancelBankDetail(customer, form);
         tbodyRequest.setUpdateCustomer(updCustomer);
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_80, "UpdateCustomer");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
-
+    @Hidden
+    @PostMapping(value = "/TEST/account", consumes = "*/*")
+    public ResponseEntity<String> testAccount (@RequestBody FormAccount form) {
+        form.setTest(true);
+        return account(form);
+    }
 
 
     @Operation(summary = "Анкета рахунку у ЦБ")
     @PostMapping(value = "/account", consumes = "*/*")
-    public ResponseEntity<String> account (@RequestBody @NotBlank String accountNum) throws IOException {
+    public ResponseEntity<String> account (@RequestBody FormAccount form) {
         long time = System.nanoTime();
+        String methodName = ACCOUNT;
 
-        Request request = getRequestWithHeader("Account", false);
+        Request request = getRequestWithHeader(methodName, form.isTest());
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         var account = new TbodyRequest.Account();
-        account.setAccount(accountNum);
+        account.setAccount(form.getAccount());
         tbodyRequest.setAccount(account);
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_PROD, "Account");
-
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
-
-    @Hidden
-    @PostMapping(value = "/TEST/account", consumes = "*/*")
-    public ResponseEntity<String> testAccount (@RequestBody @NotBlank String accountNum) throws IOException {
-        long time = System.nanoTime();
-
-        Request request = getRequestWithHeader("Account", true);
-
-        TbodyRequest tbodyRequest = new TbodyRequest();
-        var account = new TbodyRequest.Account();
-        account.setAccount(accountNum);
-        tbodyRequest.setAccount(account);
-        request.setBody(tbodyRequest);
-
-        return getResponseEntity(time, request, DEKRA_URL_80, "Account");
-
-    }
-
-
-
 
 }
 

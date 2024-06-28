@@ -7,7 +7,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.net.http.HttpClient;
 
 @RestController
@@ -19,7 +18,7 @@ public class DictionaryController extends BaseController {
     }
 
     @GetMapping(value = "/get")
-    public ResponseEntity<String> getDictionary (@RequestBody TDictionaryCustomRequest form) throws IOException {
+    public ResponseEntity<String> getDictionary (@RequestBody TDictionaryCustomRequest form) {
 
         long time = System.nanoTime();
         Request request = getRequestWithHeader("GetDictionary", false);
@@ -34,7 +33,7 @@ public class DictionaryController extends BaseController {
 
 
     @GetMapping(value = "/TEST/get")
-    public ResponseEntity<String> testGetDictionary (@RequestBody TDictionaryCustomRequest form) throws IOException {
+    public ResponseEntity<String> testGetDictionary (@RequestBody TDictionaryCustomRequest form) {
 
         long time = System.nanoTime();
         Request request = getRequestWithHeader("GetDictionary", true);
@@ -49,7 +48,7 @@ public class DictionaryController extends BaseController {
 
 
     @GetMapping(value = "/TEST/getDictionaries", consumes = "*/*", produces = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<String> testGetDictionaries () throws IOException {
+    public ResponseEntity<String> testGetDictionaries () {
 
         Request request = getRequestWithHeader("GetDictionaries", true);
 
@@ -64,7 +63,7 @@ public class DictionaryController extends BaseController {
 
     @Operation(summary = "Перегляд анкети фінансового інструменту")
     @PostMapping(value = "/getFI")
-    public ResponseEntity<String> getFI (@RequestBody TbodyRequest.GetFI form) throws IOException {
+    public ResponseEntity<String> getFI (@RequestBody TbodyRequest.GetFI form) {
 
         long time = System.nanoTime();
         Request request = getRequestWithHeader("getFI", false);

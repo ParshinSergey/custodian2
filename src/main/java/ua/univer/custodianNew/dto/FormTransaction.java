@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FormTransaction {
+public class FormTransaction extends BaseForm{
 
     @NotBlank
     private String isin;

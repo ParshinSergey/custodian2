@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FormGet {
+public class FormGet extends BaseForm {
 
     @Pattern(regexp = "^\\d{3}$", message = "должно состоять из трех цифр")
     private String nssmcClientTypeCode;

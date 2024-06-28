@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FormBalance {
+public class FormBalance extends BaseForm{
 
     @NotBlank
     private String account;

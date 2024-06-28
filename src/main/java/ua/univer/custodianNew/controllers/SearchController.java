@@ -13,7 +13,6 @@ import ua.univer.custodianNew.dto.FormSearchCustomer;
 import ua.univer.custodianNew.util.ConverterUtil;
 import ua.univer.custodianNew.util.ResponceServise;
 
-import java.io.IOException;
 import java.net.http.HttpClient;
 
 import static ua.univer.custodianNew.controllers.Util.convertFormToSearchAccount;
@@ -23,73 +22,65 @@ import static ua.univer.custodianNew.controllers.Util.convertFormToSearchCustome
 @RequestMapping(value = "/api/search", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class SearchController extends BaseController{
 
+    private static final String SEARCH_ACCOUNT = "SearchAccount";
+    private final static String SEARCH_ACCOUNT_V2 = "SearchAccountV2";
+    private final static String SEARCH_CUSTOMER = "SearchCustomer";
+
 
     public SearchController(Marshaller marshaller, HttpClient httpClient) {
         super(marshaller, httpClient);
     }
 
-    @Operation(summary = "Пошуковий запит. Перелік рахунків у ЦБ(V2)")
-    @PostMapping(value = "/accountV2", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> searchAccountV2 (@RequestBody @Valid FormSearch form) throws IOException {
 
-        long time = System.nanoTime();
-        Request request = getRequestWithHeader("SearchAccountV2", false);
-
-        TbodyRequest tbodyRequest = Util.convertFormToSearchAccountV2(form);
-        request.setBody(tbodyRequest);
-
-        if (form.getBrokerID() != null){
-            String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_PROD, "SearchAccV2");
-            Responce responce = getResponceFromXml(dekraResponse);
-            Responce responceWithBroker = ResponceServise.getResponceWithBroker(responce, form.getBrokerID());
-            logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
-            return ResponseEntity.ok().body(ConverterUtil.objectToJson(responceWithBroker));
-        }
-
-        return getResponseEntity(time, request, DEKRA_URL_PROD, "SearchAccountV2");
+    @PostMapping(value = "/TEST/accountV2", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> searchAccountV2WithBroker (@RequestBody @Valid FormSearch form) {
+        form.setTest(true);
+        return searchAccountV2(form);
     }
 
 
-    @PostMapping(value = "/TEST/accountV2", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> searchAccountV2WithBroker (@RequestBody @Valid FormSearch form) throws IOException {
+    @Operation(summary = "Пошуковий запит. Перелік рахунків у ЦБ(V2)")
+    @PostMapping(value = "/accountV2", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> searchAccountV2 (@RequestBody @Valid FormSearch form) {
 
         long time = System.nanoTime();
-        Request request = getRequestWithHeader("SearchAccountV2", true);
-
+        String methodName = SEARCH_ACCOUNT_V2;
+        Request request = getRequestWithHeader(methodName, form.isTest());
         TbodyRequest tbodyRequest = Util.convertFormToSearchAccountV2(form);
         request.setBody(tbodyRequest);
 
         if (form.getBrokerID() != null){
-            String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_80, "SearchAccV2");
-            //String dekraResponse = writeAndSendRequest(request, DEKRA_URL_80, "SearchAccV2");
+            String dekraResponse = writeAndSendRequestWriteResponseToFile(request, form.ipAddress(), "SearchWithBroker");
             Responce responce = getResponceFromXml(dekraResponse);
             Responce responceWithBroker = ResponceServise.getResponceWithBroker(responce, form.getBrokerID());
             logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
             return ResponseEntity.ok().body(ConverterUtil.objectToJson(responceWithBroker));
         }
 
-        return getResponseEntity(time, request, DEKRA_URL_80, "SearchAccountV2");
-
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
     @PostMapping(value = "/TEST/account")
-    public ResponseEntity<String> searchAccount (@RequestBody @Valid FormSearchAccount account) throws IOException {
+    public ResponseEntity<String> searchAccount (@RequestBody @Valid FormSearchAccount form) {
 
+        form.setTest(true);
         long time = System.nanoTime();
-        Request request = getRequestWithHeader("SearchAccount", true);
-
-        TbodyRequest tbodyRequest = convertFormToSearchAccount(account);
+        String methodName = SEARCH_ACCOUNT;
+        Request request = getRequestWithHeader(methodName, form.isTest());
+        TbodyRequest tbodyRequest = convertFormToSearchAccount(form);
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_80, "SearchAcc");
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
 
 
     @PostMapping(value = "/TEST/customer")
-    public ResponseEntity<String> searchCustomer(@RequestBody @Valid FormSearchCustomer form) throws IOException {
+    public ResponseEntity<String> searchCustomer(@RequestBody @Valid FormSearchCustomer form) {
 
-        Request request = getRequestWithHeader("SearchCustomer", true);
+        form.setTest(true);
+        String methodName = SEARCH_CUSTOMER;
+        Request request = getRequestWithHeader(methodName, form.isTest());
 
         TSearchCustomer customer = convertFormToSearchCustomer(form);
 
@@ -97,7 +88,7 @@ public class SearchController extends BaseController{
         tbodyRequest.setSearchCustomer(customer);
         request.setBody(tbodyRequest);
 
-        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, DEKRA_URL_80, "SearchCustomer");
+        String dekraResponse = writeAndSendRequestWriteResponseToFile(request, form.ipAddress(), methodName);
 
         return ResponseEntity.ok().body(dekraResponse);
 

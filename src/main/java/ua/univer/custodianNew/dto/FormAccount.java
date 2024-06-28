@@ -8,8 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FormReserveCancel {
+public class FormAccount extends BaseForm{
 
     @NotBlank
     private String account;
+
+    public FormAccount(String account, boolean isTest) {
+        this.account = account;
+        this.setTest(isTest);
+    }
 }
