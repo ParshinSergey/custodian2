@@ -172,6 +172,7 @@ public final class Util {
 
 
         var bankDetails = new TCustomer.BankDetails();
+        /*
         addBankDetail(bankDetails, form.getMfo(), form.getIban(), form.getCardAccount(), form.getBankName(),
                 form.getCurrency(), form.getBic(), form.getLei(), form.isUse4Income(), form.getType());
         addBankDetail(bankDetails, form.getMfo1(), form.getIban1(), form.getCardAccount1(), form.getBankName1(),
@@ -180,6 +181,16 @@ public final class Util {
                 form.getCurrency2(), form.getBic2(), form.getLei2(), form.isUse4Income2(), form.getType2());
         addBankDetail(bankDetails, form.getMfo3(), form.getIban3(), form.getCardAccount3(), form.getBankName3(),
                 form.getCurrency3(), form.getBic3(), form.getLei3(), form.isUse4Income3(), form.getType3());
+*/
+        addBankDetail(bankDetails, form.getMfo(), form.getIban(), form.getCardAccount(), form.getBankName(), form.getCurrency(), form.getBic(),
+                form.getLei(), form.isUse4Income(), form.getType(), form.getCorrBankIban(), form.getCorrBankName(), form.getCorrBankBic());
+        addBankDetail(bankDetails, form.getMfo1(), form.getIban1(), form.getCardAccount1(), form.getBankName1(), form.getCurrency1(), form.getBic1(),
+                form.getLei1(), form.isUse4Income1(), form.getType1(), form.getCorrBankIban1(), form.getCorrBankName1(), form.getCorrBankBic1());
+        addBankDetail(bankDetails, form.getMfo2(), form.getIban2(), form.getCardAccount2(), form.getBankName2(), form.getCurrency2(), form.getBic2(),
+                form.getLei2(), form.isUse4Income2(), form.getType2(), form.getCorrBankIban2(), form.getCorrBankName2(), form.getCorrBankBic2());
+        addBankDetail(bankDetails, form.getMfo3(), form.getIban3(), form.getCardAccount3(), form.getBankName3(), form.getCurrency3(), form.getBic3(),
+                form.getLei3(), form.isUse4Income3(), form.getType3(), form.getCorrBankIban3(), form.getCorrBankName3(), form.getCorrBankBic3());
+
         tCustomer.setBankDetails(bankDetails);
 
 
@@ -260,7 +271,7 @@ public final class Util {
         return tbodyRequest;
     }
 
-
+/*
     private static TBankDetail getBankDetail(String mfo, String iban, String card, String bank, String currency,
                                              String bic, String lei, boolean use4Income, Integer type) {
         TBankDetail bankDetail = new TBankDetail();
@@ -282,16 +293,46 @@ public final class Util {
             TBankDetail bankDetail = getBankDetail(mfo, iban, card, bank, currency, bic, lei, use4Income, type);
             bankDetails.getBankDetail().add(bankDetail);
         }
-    }
+    }*/
 
-    private static void addBankDetailForUpdate(TupdateCustomer.BankDetails bankDetails, String mfo, String iban, String card, String bank, String currency, String bic, String lei, boolean use4Income, Integer type) {
+    private static void addBankDetailForUpdate(TupdateCustomer.BankDetails bankDetails, String mfo, String iban, String card, String bank, String currency, String bic, String lei, boolean use4Income, Integer type,
+                                               String corrBankIban, String corrBankName, String corrBankBic) {
         if (type != null && StringUtils.hasLength(iban)) {
-            TBankDetail bankDetail = getBankDetail(mfo, iban, card, bank, currency, bic, lei, use4Income, type);
+            TBankDetail bankDetail = getBankDetail(mfo, iban, card, bank, currency, bic, lei, use4Income, type, corrBankIban, corrBankName, corrBankBic);
             bankDetail.setChanged(true);
             bankDetails.getBankDetail().add(bankDetail);
         }
     }
 
+
+    private static void addBankDetail(TCustomer.BankDetails bankDetails, String mfo, String iban, String card, String bank, String currency, String bic, String lei, boolean use4Income, Integer type,
+                                         String corrBankIban, String corrBankName, String corrBankBic) {
+        if (type != null && StringUtils.hasLength(iban)) {
+            TBankDetail bankDetail = getBankDetail(mfo, iban, card, bank, currency, bic, lei, use4Income, type, corrBankIban, corrBankName, corrBankBic);
+            bankDetails.getBankDetail().add(bankDetail);
+        }
+    }
+
+    private static TBankDetail getBankDetail(String mfo, String iban, String card, String bank, String currency, String bic, String lei, boolean use4Income, Integer type,
+                                                String corrBankIban, String corrBankName, String corrBankBic) {
+        TBankDetail bankDetail = new TBankDetail();
+        bankDetail.setMFO(mfo);
+        bankDetail.setIBAN(iban);
+        bankDetail.setCardAccount(card);
+        bankDetail.setBankName(bank);
+        bankDetail.setCurrency(currency);
+        bankDetail.setBIC(bic);
+        bankDetail.setLEI(lei);
+        bankDetail.setUse4Income(use4Income);
+        bankDetail.setType(new BigInteger(type.toString()));
+        var corrBank = new TBankDetailBase.CorrBank();
+        corrBank.setIBAN(corrBankIban);
+        corrBank.setBankName(corrBankName);
+        corrBank.setBIC(corrBankBic);
+        bankDetail.setCorrBank(corrBank);
+
+        return bankDetail;
+    }
 
 
     public static TbodyRequest convertFormToSearchAccountV2(FormSearch form) {
@@ -479,13 +520,13 @@ public final class Util {
         var bankDetails = new TupdateCustomer.BankDetails();
         List<TBankDetail> originListBankDetail = origin.getBankDetails().getBankDetail();
         addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo(), form.getIban(), form.getCardAccount(), form.getBankName(),
-                form.getCurrency(), form.getBic(), form.getLei(), form.isUse4Income(), form.getType());
+                form.getCurrency(), form.getBic(), form.getLei(), form.isUse4Income(), form.getType(), form.getCorrBankIban(), form.getCorrBankName(), form.getCorrBankBic());
         addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo1(), form.getIban1(), form.getCardAccount1(), form.getBankName1(),
-                form.getCurrency1(), form.getBic1(), form.getLei1(), form.isUse4Income1(), form.getType1());
+                form.getCurrency1(), form.getBic1(), form.getLei1(), form.isUse4Income1(), form.getType1(), form.getCorrBankIban1(), form.getCorrBankName1(), form.getCorrBankBic1());
         addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo2(), form.getIban2(), form.getCardAccount2(), form.getBankName2(),
-                form.getCurrency2(), form.getBic2(), form.getLei2(), form.isUse4Income2(), form.getType2());
+                form.getCurrency2(), form.getBic2(), form.getLei2(), form.isUse4Income2(), form.getType2(), form.getCorrBankIban2(), form.getCorrBankName2(), form.getCorrBankBic2());
         addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo3(), form.getIban3(), form.getCardAccount3(), form.getBankName3(),
-                form.getCurrency3(), form.getBic3(), form.getLei3(), form.isUse4Income3(), form.getType3());
+                form.getCurrency3(), form.getBic3(), form.getLei3(), form.isUse4Income3(), form.getType3(), form.getCorrBankIban3(), form.getCorrBankName3(), form.getCorrBankBic3());
         result.setBankDetails(bankDetails);
 
         var contact = new TupdateCustomer.Contact();
@@ -545,7 +586,7 @@ public final class Util {
 
 
     private static void addUpdatedBankDetail(TupdateCustomer.BankDetails bankDetails, List<TBankDetail> originListBankDetail, String mfo, String iban, String cardAccount,
-                                             String bankName, String currency, String bic, String lei, boolean use4Income, Integer type) {
+                                             String bankName, String currency, String bic, String lei, boolean use4Income, Integer type, String corrBankIban, String corrBankName, String corrBankBic) {
         boolean find = false;
         if (iban != null) {
             for (TBankDetail tBankDetail : originListBankDetail) {
@@ -555,7 +596,7 @@ public final class Util {
                 }
             }
             if (!find) {
-                addBankDetailForUpdate(bankDetails, mfo, iban, cardAccount, bankName, currency, bic, lei, use4Income, type);
+                addBankDetailForUpdate(bankDetails, mfo, iban, cardAccount, bankName, currency, bic, lei, use4Income, type, corrBankIban, corrBankName, corrBankBic);
             }
         }
     }
@@ -571,6 +612,10 @@ public final class Util {
         for (TBankDetail tBankDetail : originListBankDetail) {
             if (form.getIban().trim().equalsIgnoreCase(tBankDetail.getIBAN())) {
                 TBankDetail.Period period = tBankDetail.getPeriod();
+                if(period == null){
+                    period = new TBankDetail.Period();
+                    System.out.println("------ Attention!! Very rare case. ------");
+                }
                 period.setDateStop(xmlGregorianCalendar(LocalDateTime.now()));
                 tBankDetail.setPeriod(period);
                 tBankDetail.setUse4Income(false);

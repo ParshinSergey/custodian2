@@ -231,7 +231,7 @@ public class AccountController extends BaseController {
 
 
     @Hidden
-    @PostMapping(value = "/TEST/account", consumes = "*/*")
+    @PostMapping(value = "/TEST/account")
     public ResponseEntity<String> testAccount (@RequestBody FormAccount form) {
         form.setTest(true);
         return account(form);
@@ -239,7 +239,7 @@ public class AccountController extends BaseController {
 
 
     @Operation(summary = "Анкета рахунку у ЦБ")
-    @PostMapping(value = "/account", consumes = "*/*")
+    @PostMapping(value = "/account")
     public ResponseEntity<String> account (@RequestBody FormAccount form) {
         long time = System.nanoTime();
         String methodName = ACCOUNT;

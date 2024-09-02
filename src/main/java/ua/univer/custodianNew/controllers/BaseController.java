@@ -9,9 +9,7 @@ import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 import ua.univer.custodianNew.exceptions.DekraException;
 import ua.univer.custodianNew.util.ConverterUtil;
 
@@ -20,7 +18,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
+import java.time.Duration;
 
 public class BaseController {
 
@@ -108,6 +106,7 @@ public class BaseController {
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(ipAddress))
+                .timeout(Duration.ofSeconds(70))
                 .POST(HttpRequest.BodyPublishers.ofString(xmlString))
                 .header("Content-Type", "application/xml")
                 .build();

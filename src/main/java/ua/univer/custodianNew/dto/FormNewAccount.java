@@ -85,6 +85,11 @@ public class FormNewAccount extends BaseForm{
     private boolean use4Income;
     private Integer type;
 
+    private String corrBankIban;
+    private String corrBankName;
+    private String corrBankBic;
+
+
     @Pattern(regexp = "^\\d{6}$|^$", message = "должно состоять из шести цифр или быть пустым")
     private String mfo1;
     @Size(max = 34)
@@ -101,6 +106,9 @@ public class FormNewAccount extends BaseForm{
     private String lei1;
     private boolean use4Income1;
     private Integer type1;
+    private String corrBankIban1;
+    private String corrBankName1;
+    private String corrBankBic1;
 
     @Pattern(regexp = "^\\d{6}$|^$", message = "должно состоять из шести цифр или быть пустым")
     private String mfo2;
@@ -118,6 +126,9 @@ public class FormNewAccount extends BaseForm{
     private String lei2;
     private boolean use4Income2;
     private Integer type2;
+    private String corrBankIban2;
+    private String corrBankName2;
+    private String corrBankBic2;
 
     @Pattern(regexp = "^\\d{6}$|^$", message = "должно состоять из шести цифр или быть пустым")
     private String mfo3;
@@ -135,6 +146,9 @@ public class FormNewAccount extends BaseForm{
     private String lei3;
     private boolean use4Income3;
     private Integer type3;
+    private String corrBankIban3;
+    private String corrBankName3;
+    private String corrBankBic3;
 
     private String phone;
     private String mobilePhone;

@@ -74,7 +74,7 @@ public class AppConfiguration {
         //HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
         return HttpClient.newBuilder()
-                //.connectTimeout(Duration.ofMillis(10 * 1000))
+                .connectTimeout(Duration.ofSeconds(30))
                 .sslContext(sc)
                 .build();
     }
