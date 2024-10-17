@@ -56,11 +56,13 @@ public class FormNewAccount extends BaseForm{
     private String house;
     private String flat;
     @Size(max = 256)
+    @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
     private String addressFree;
 
     private String docSerial;
     private String docNumber;
     private String docDate;
+    @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
     private String docWho;
     private String docType;
     private String docDatestart;
@@ -157,6 +159,7 @@ public class FormNewAccount extends BaseForm{
     @Setter(AccessLevel.NONE)
     private String eMailGeneral;
     private String birthDate;
+    @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
     private String birthPlace;
     private boolean refusingCode;
 

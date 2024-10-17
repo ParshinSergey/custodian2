@@ -18,7 +18,7 @@ public class AppExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationExceptions (MethodArgumentNotValidException ex) {
         StringBuilder sb = new StringBuilder();
-        ex.getBindingResult().getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append(" "));
+        ex.getBindingResult().getFieldErrors().forEach(fe -> sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("; "));
         log.warn(sb.toString());
         return new ResponseEntity<>(String.format(TEXT_MISTAKE, sb.toString()),HttpStatus.BAD_REQUEST);
     }
