@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.univer.custodianNew.dto.FormAccount;
 import ua.univer.custodianNew.dto.FormNewAccount;
 import ua.univer.custodianNew.dto.FormGet;
+import ua.univer.custodianNew.exceptions.DekraException;
 import ua.univer.custodianNew.util.ConverterUtil;
 
 import java.io.*;
@@ -170,6 +171,10 @@ public class AccountController extends BaseController {
     @PostMapping(value = "/updateCustomer")
     public ResponseEntity<String> updateCustomer (@RequestBody FormNewAccount form) {
 
+        if (form.getIdCode().length() == 8){
+            return ResponseEntity.badRequest().body("ВНИМАНИЕ!! Попытка изменить Анкету Юр.лица. Account " + form.getAccount() + ", ИНН " + form.getIdCode());
+        }
+
         long time = System.nanoTime();
         String methodName = UPDATE_CUSTOMER;
 
@@ -232,7 +237,7 @@ public class AccountController extends BaseController {
 
     @Hidden
     @PostMapping(value = "/TEST/account")
-    public ResponseEntity<String> testAccount (@RequestBody FormAccount form) {
+    public ResponseEntity<String> testAccount (@RequestBody @Valid FormAccount form) {
         form.setTest(true);
         return account(form);
     }
@@ -240,7 +245,7 @@ public class AccountController extends BaseController {
 
     @Operation(summary = "Анкета рахунку у ЦБ")
     @PostMapping(value = "/account")
-    public ResponseEntity<String> account (@RequestBody FormAccount form) {
+    public ResponseEntity<String> account (@RequestBody @Valid FormAccount form) {
         long time = System.nanoTime();
         String methodName = ACCOUNT;
 

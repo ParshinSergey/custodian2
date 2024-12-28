@@ -511,7 +511,8 @@ public final class Util {
             contact.setMobilePhone(mobilePhone);
         }
         String updatedMailGeneral = form.geteMailGeneral();
-        if (updatedMailGeneral != null && !updatedMailGeneral.trim().equalsIgnoreCase(origin.getContact().getEMails().getEMailGeneral().getValue())){
+        if (origin.getContact().getEMails() == null ||
+                (updatedMailGeneral != null && !updatedMailGeneral.trim().equalsIgnoreCase(origin.getContact().getEMails().getEMailGeneral().getValue()))){
             var eMails = new TContact.EMails();
             var eMailGeneral = new TContact.EMails.EMailGeneral();
             eMailGeneral.setValue(updatedMailGeneral);
@@ -556,7 +557,7 @@ public final class Util {
         boolean find = false;
         if (iban != null) {
             for (TBankDetail tBankDetail : originListBankDetail) {
-                if (iban.trim().equalsIgnoreCase(tBankDetail.getIBAN())) {
+                if (iban.trim().equalsIgnoreCase(tBankDetail.getIBAN()) && tBankDetail.getPeriod().getDateStop() == null) {
                     find = true;
                     break;
                 }
