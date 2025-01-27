@@ -19,23 +19,21 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * Информация о договоре на открытие счета/брокерском договоре
- * 
- * <p>Java class for TAgreement complex type.
+ * <p>Java class for TcrsReporting complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="TAgreement"&gt;
+ * &lt;complexType name="TcrsReporting"&gt;
  *   &lt;complexContent&gt;
- *     &lt;extension base="{urn:dmt:custodian2016}TAgreementBase"&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}integer" minOccurs="0"/&gt;
+ *         &lt;element name="Reporting" type="{http://www.w3.org/2001/XMLSchema}boolean"/&gt;
  *         &lt;element name="dateStart" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/&gt;
  *         &lt;element name="dateStop" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/&gt;
- *         &lt;element name="AgrID" type="{http://www.w3.org/2001/XMLSchema}integer" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
+ *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
@@ -43,52 +41,63 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TAgreement", propOrder = {
-    "type",
+@XmlType(name = "TcrsReporting", propOrder = {
+    "id",
+    "reporting",
     "dateStart",
-    "dateStop",
-    "agrID"
+    "dateStop"
 })
 @XmlSeeAlso({
-    dmt.custodian2016.TupdateAccount.Agreements.Agreement.class,
-    dmt.custodian2016.TAccountSimple.Agreements.Agreement.class,
-    dmt.custodian2016.TnewAccountRequest.Agreements.Agreement.class,
-    dmt.custodian2016.TnewAccountRequest.BrokerAgreements.BrokerAgreement.class
+    dmt.custodian2016.TcrsAccount.Reportings.Reporting.class
 })
-public class TAgreement
-    extends TAgreementBase
-{
+public class TcrsReporting {
 
-    protected String type;
+    protected BigInteger id;
+    @XmlElement(name = "Reporting")
+    protected boolean reporting;
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar dateStart;
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar dateStop;
-    @XmlElement(name = "AgrID")
-    protected BigInteger agrID;
 
     /**
-     * Gets the value of the type property.
+     * Gets the value of the id property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link BigInteger }
      *     
      */
-    public String getType() {
-        return type;
+    public BigInteger getId() {
+        return id;
     }
 
     /**
-     * Sets the value of the type property.
+     * Sets the value of the id property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link BigInteger }
      *     
      */
-    public void setType(String value) {
-        this.type = value;
+    public void setId(BigInteger value) {
+        this.id = value;
+    }
+
+    /**
+     * Gets the value of the reporting property.
+     * 
+     */
+    public boolean isReporting() {
+        return reporting;
+    }
+
+    /**
+     * Sets the value of the reporting property.
+     * 
+     */
+    public void setReporting(boolean value) {
+        this.reporting = value;
     }
 
     /**
@@ -137,30 +146,6 @@ public class TAgreement
      */
     public void setDateStop(XMLGregorianCalendar value) {
         this.dateStop = value;
-    }
-
-    /**
-     * Gets the value of the agrID property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getAgrID() {
-        return agrID;
-    }
-
-    /**
-     * Sets the value of the agrID property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setAgrID(BigInteger value) {
-        this.agrID = value;
     }
 
 }

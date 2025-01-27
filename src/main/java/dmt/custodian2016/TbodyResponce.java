@@ -43,6 +43,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *         &lt;element name="limitList" type="{urn:dmt:custodian2016}TLimits"/&gt;
  *         &lt;element name="fiList" type="{urn:dmt:custodian2016}TFI_list"/&gt;
  *         &lt;element name="invoiceList" type="{urn:dmt:custodian2016}TInvoiceList"/&gt;
+ *         &lt;element name="invoiceListDetail" type="{urn:dmt:custodian2016}TInvoiceListWDetail"/&gt;
  *         &lt;element name="AccountNum" type="{urn:dmt:custodian2016}TAccount_Num"/&gt;
  *         &lt;element name="dictionary" type="{urn:dmt:custodian2016}TDictionaryCustom"/&gt;
  *         &lt;element name="binary" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
@@ -52,6 +53,8 @@ import jakarta.xml.bind.annotation.XmlType;
  *         &lt;element name="customReport" type="{urn:dmt:custodian2016}TCustomReport"/&gt;
  *         &lt;element name="reportParams" type="{urn:dmt:custodian2016}TCustomReportParams"/&gt;
  *         &lt;element name="customReports" type="{urn:dmt:custodian2016}TCustomReportList"/&gt;
+ *         &lt;element name="Sanctions" type="{urn:dmt:custodian2016}TSanctionCheckResponce"/&gt;
+ *         &lt;element name="passports" type="{urn:dmt:custodian2016}TPassportCheckResponce"/&gt;
  *       &lt;/choice&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -79,6 +82,7 @@ import jakarta.xml.bind.annotation.XmlType;
     "limitList",
     "fiList",
     "invoiceList",
+    "invoiceListDetail",
     "accountNum",
     "dictionary",
     "binary",
@@ -87,7 +91,9 @@ import jakarta.xml.bind.annotation.XmlType;
     "incomeList",
     "customReport",
     "reportParams",
-    "customReports"
+    "customReports",
+    "sanctions",
+    "passports"
 })
 public class TbodyResponce {
 
@@ -120,6 +126,7 @@ public class TbodyResponce {
     protected TLimits limitList;
     protected TFIList fiList;
     protected TInvoiceList invoiceList;
+    protected TInvoiceListWDetail invoiceListDetail;
     @XmlElement(name = "AccountNum")
     protected String accountNum;
     protected TDictionaryCustom dictionary;
@@ -133,6 +140,9 @@ public class TbodyResponce {
     protected TCustomReport customReport;
     protected TCustomReportParams reportParams;
     protected TCustomReportList customReports;
+    @XmlElement(name = "Sanctions")
+    protected TSanctionCheckResponce sanctions;
+    protected TPassportCheckResponce passports;
 
     /**
      * Gets the value of the customer property.
@@ -543,6 +553,30 @@ public class TbodyResponce {
     }
 
     /**
+     * Gets the value of the invoiceListDetail property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TInvoiceListWDetail }
+     *     
+     */
+    public TInvoiceListWDetail getInvoiceListDetail() {
+        return invoiceListDetail;
+    }
+
+    /**
+     * Sets the value of the invoiceListDetail property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TInvoiceListWDetail }
+     *     
+     */
+    public void setInvoiceListDetail(TInvoiceListWDetail value) {
+        this.invoiceListDetail = value;
+    }
+
+    /**
      * Gets the value of the accountNum property.
      * 
      * @return
@@ -756,6 +790,54 @@ public class TbodyResponce {
      */
     public void setCustomReports(TCustomReportList value) {
         this.customReports = value;
+    }
+
+    /**
+     * Gets the value of the sanctions property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TSanctionCheckResponce }
+     *     
+     */
+    public TSanctionCheckResponce getSanctions() {
+        return sanctions;
+    }
+
+    /**
+     * Sets the value of the sanctions property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TSanctionCheckResponce }
+     *     
+     */
+    public void setSanctions(TSanctionCheckResponce value) {
+        this.sanctions = value;
+    }
+
+    /**
+     * Gets the value of the passports property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TPassportCheckResponce }
+     *     
+     */
+    public TPassportCheckResponce getPassports() {
+        return passports;
+    }
+
+    /**
+     * Sets the value of the passports property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TPassportCheckResponce }
+     *     
+     */
+    public void setPassports(TPassportCheckResponce value) {
+        this.passports = value;
     }
 
 }
