@@ -37,4 +37,11 @@ public class AppExceptionHandler {
         return ResponseEntity.internalServerError().body(answer);
     }
 
+    @ExceptionHandler(UnprocessableEntityException.class)
+    public ResponseEntity<String> handleUnprocessableEntityException (UnprocessableEntityException ex) {
+        String answer = String.format(TEXT_MISTAKE, ex.getMessage());
+        log.warn(answer);
+        return ResponseEntity.unprocessableEntity().body(answer);
+    }
+
 }

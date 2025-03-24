@@ -11,13 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import ua.univer.custodianNew.dto.FormAccount;
 import ua.univer.custodianNew.dto.FormNewAccount;
 import ua.univer.custodianNew.dto.FormGet;
-import ua.univer.custodianNew.exceptions.DekraException;
+import ua.univer.custodianNew.exceptions.UnprocessableEntityException;
 import ua.univer.custodianNew.util.ConverterUtil;
 
-import java.io.*;
 import java.net.http.HttpClient;
 
-import static ua.univer.custodianNew.exceptions.AppExceptionHandler.TEXT_MISTAKE;
 
 @RestController
 @RequestMapping(value = "/api/request", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -27,7 +25,8 @@ public class AccountController extends BaseController {
     private static final String GET_ACCOUNT_NUM = "GetAccountNum";
     private static final String UPDATE_CUSTOMER = "UpdateCustomerV2";
     private static final String ACCOUNT = "Account";
-    private static final String ACCOUNT_NUM_RESERVE_CANCEL ="AccountNumReserveCancel";
+    private static final String ACCOUNT_NUM_RESERVE_CANCEL = "AccountNumReserveCancel";
+    private static final String UPDATE_ACCOUNT = "UpdateAccountV2";
 
     public AccountController(Marshaller marshaller, HttpClient httpClient) {
         super(marshaller, httpClient);
@@ -178,12 +177,13 @@ public class AccountController extends BaseController {
         long time = System.nanoTime();
         String methodName = UPDATE_CUSTOMER;
 
-        String dekraResponse = account(new FormAccount(form.getAccount(), form.isTest())).getBody();
+       /* String dekraResponse = account(new FormAccount(form.getAccount(), form.isTest())).getBody();
         Responce responce = ConverterUtil.jsonToObject(dekraResponse, Responce.class);
         if (responce.getBody() == null){
             return ResponseEntity.ok().body("Не найдено аккаунта " + form.getAccount());
-        }
-        TCustomer customer = responce.getBody().getAccount().getCustomer();
+        }*/
+
+        TCustomer customer = getCustomerByAccount(form.getAccount(), form.isTest());
 
         // check for equal INN
         if (!customer.getIdCode().getValue().equals(form.getIdCode())){
@@ -214,7 +214,9 @@ public class AccountController extends BaseController {
         long time = System.nanoTime();
         String methodName = UPDATE_CUSTOMER;
 
-        String dekraResponse = account(new FormAccount(form.getAccount(), form.isTest())).getBody();
+        TCustomer customer = getCustomerByAccount(form.getAccount(), form.isTest());
+
+        /*String dekraResponse = account(new FormAccount(form.getAccount(), form.isTest())).getBody();
         Responce responce = ConverterUtil.jsonToObject(dekraResponse, Responce.class);
 
         if (responce.getBody() == null){
@@ -223,7 +225,7 @@ public class AccountController extends BaseController {
             return ResponseEntity.unprocessableEntity().body(answer);
            // return ResponseEntity.ok().body("Не найдено аккаунта " + form.getAccount());
         }
-        TCustomer customer = responce.getBody().getAccount().getCustomer();
+        TCustomer customer = responce.getBody().getAccount().getCustomer();*/
 
         Request request = getRequestWithHeader(methodName, form.isTest());
         TbodyRequest tbodyRequest = new TbodyRequest();
@@ -258,6 +260,53 @@ public class AccountController extends BaseController {
         request.setBody(tbodyRequest);
 
         return getResponseEntity(time, request, form.ipAddress(), methodName);
+    }
+
+
+    @PostMapping(value = "/TEST/updateAccount")
+    public ResponseEntity<String> testUpdateAccount (@RequestBody FormNewAccount form) {
+        form.setTest(true);
+        return updateAccount(form);
+    }
+
+
+    @Operation(summary = "Редагування рахунку")
+    @PostMapping(value = "/updateAccount")
+    public ResponseEntity<String> updateAccount (@RequestBody FormNewAccount form){
+
+        long time = System.nanoTime();
+        String methodName = UPDATE_ACCOUNT;
+
+        TCustomer customer = getCustomerByAccount(form.getAccount(), form.isTest());
+
+        if (!customer.getIdCode().getValue().equals(form.getIdCode())){
+            throw new UnprocessableEntityException("Несоответствие ИНН и Account");
+        }
+
+        Request request = getRequestWithHeader(methodName, form.isTest());
+
+        TupdateCustomer updCustomer = Util.makeCustomerForUpdate(customer, form);
+        TupdateAccount updAccount = new TupdateAccount();
+        updAccount.setAccount(form.getAccount());
+        updAccount.setCustomer(updCustomer);
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setUpdateAccount(updAccount);
+        request.setBody(tbodyRequest);
+
+        return getResponseEntity(time, request, form.ipAddress(), methodName);
+    }
+
+
+    private TCustomer getCustomerByAccount(String account, boolean test) {
+
+        String dekraResponse = account(new FormAccount(account, test)).getBody();
+        Responce responce = ConverterUtil.jsonToObject(dekraResponse, Responce.class);
+        if (responce.getBody() == null || responce.getBody().getAccount() == null){
+            throw new UnprocessableEntityException("Не найдено аккаунта " + account);
+        }
+
+        return responce.getBody().getAccount().getCustomer();
     }
 
 }

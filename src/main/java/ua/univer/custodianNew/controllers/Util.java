@@ -204,6 +204,15 @@ public final class Util {
         eMailStatement.setValue(form.geteMailGeneral());
         eMail.setEMailStatement(eMailStatement);
         contact.setEMails(eMail);
+
+        var reestrOwner = new TContact.ReestrOwner();
+        var roMobPhone = new TContact.ReestrOwner.MobilePhone();
+        roMobPhone.setValue(form.getMobilePhone());
+        reestrOwner.setMobilePhone(roMobPhone);
+        var roEmail = new TContact.ReestrOwner.EMail();
+        roEmail.setValue(form.geteMailGeneral());
+        reestrOwner.setEMail(roEmail);
+        contact.setReestrOwner(reestrOwner);
         tCustomer.setContact(contact);
 
         var birthInfo = new TCustomer.BirthInfo();
@@ -557,7 +566,9 @@ public final class Util {
         boolean find = false;
         if (iban != null) {
             for (TBankDetail tBankDetail : originListBankDetail) {
-                if (iban.trim().equalsIgnoreCase(tBankDetail.getIBAN()) && tBankDetail.getPeriod().getDateStop() == null) {
+                if (iban.trim().equalsIgnoreCase(tBankDetail.getIBAN()) &&
+                        tBankDetail.getPeriod().getDateStop() == null &&
+                        tBankDetail.getCurrency().equalsIgnoreCase(currency)) {
                     find = true;
                     break;
                 }
@@ -574,29 +585,31 @@ public final class Util {
         updateCustomer.setAccount(form.getAccount());
         updateCustomer.setCustomerID(customer.getCustomerID());
 
-        TBankDetail newRekv = new TBankDetail();
         List<TBankDetail> originListBankDetail = customer.getBankDetails().getBankDetail();
         for (TBankDetail tBankDetail : originListBankDetail) {
-            if (form.getIban().trim().equalsIgnoreCase(tBankDetail.getIBAN())) {
+            if (form.getIban().trim().equalsIgnoreCase(tBankDetail.getIBAN()) &&
+                    tBankDetail.getCurrency().equalsIgnoreCase(form.getCurrency())) {
                 TBankDetail.Period period = tBankDetail.getPeriod();
-                if(period == null){
+                if (period == null) {
                     period = new TBankDetail.Period();
                     System.out.println("------ Attention!! Very rare case. ------");
+                } else {
+                    if (period.getDateStop() != null) break;
                 }
                 period.setDateStop(xmlGregorianCalendar(LocalDateTime.now()));
                 tBankDetail.setPeriod(period);
                 tBankDetail.setUse4Income(false);
                 tBankDetail.setChanged(true);
-                newRekv = tBankDetail;
+                var bankDetails = new TupdateCustomer.BankDetails();
+                bankDetails.getBankDetail().add(tBankDetail);
+                updateCustomer.setBankDetails(bankDetails);
                 break;
             }
         }
-        var bankDetails = new TupdateCustomer.BankDetails();
-        bankDetails.getBankDetail().add(newRekv);
-        updateCustomer.setBankDetails(bankDetails);
 
         return updateCustomer;
     }
+
 
     public static boolean isPerson (BaseForm obj){
         if(obj instanceof FormNewAccount form){
