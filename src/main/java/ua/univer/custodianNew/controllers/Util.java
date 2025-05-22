@@ -381,7 +381,7 @@ public final class Util {
         result.setCustomerID(origin.getCustomerID());
 
         String updatedCnum = form.getCnum();
-        if (updatedCnum != null && !updatedCnum.trim().equalsIgnoreCase(origin.getCNUM().getValue())){
+        if (updatedCnum != null && (origin.getCNUM() == null || !updatedCnum.trim().equalsIgnoreCase(origin.getCNUM().getValue()))){
             var cnum = new TupdateCustomer.CNUM();
             cnum.setValue(updatedCnum);
             cnum.setChanged(true);
@@ -506,14 +506,14 @@ public final class Util {
 
         var contact = new TupdateCustomer.Contact();
         String updatedPhone = form.getPhone();
-        if (updatedPhone != null && !updatedPhone.trim().equalsIgnoreCase(origin.getContact().getPhone().getValue())) {
+        if (updatedPhone != null && (origin.getContact().getPhone() == null || !updatedPhone.trim().equalsIgnoreCase(origin.getContact().getPhone().getValue()))) {
             var phone = new TContact.Phone();
             phone.setValue(updatedPhone);
             phone.setChanged(true);
             contact.setPhone(phone);
         }
         String updatedMobilePhone = form.getMobilePhone();
-        if (updatedMobilePhone != null && !updatedMobilePhone.trim().equalsIgnoreCase(origin.getContact().getMobilePhone().getValue())){
+        if (updatedMobilePhone != null && (origin.getContact().getMobilePhone() == null || !updatedMobilePhone.trim().equalsIgnoreCase(origin.getContact().getMobilePhone().getValue()))){
             var mobilePhone = new TContact.MobilePhone();
             mobilePhone.setValue(updatedMobilePhone);
             mobilePhone.setChanged(true);
@@ -550,7 +550,7 @@ public final class Util {
             birthInfo.setChanged(true);
         }
         XMLGregorianCalendar updatedBirthDate = oneBoxCalendar(form.getBirthDate());
-        if (updatedBirthDate != null && updatedBirthDate.compare(origin.getBirthInfo().getBirthDate()) != 0){
+        if (updatedBirthDate != null && (origin.getBirthInfo().getBirthDate() == null || updatedBirthDate.compare(origin.getBirthInfo().getBirthDate()) != 0)){
             birthInfo.setBirthDate(updatedBirthDate);
             birthInfo.setChanged(true);
         }

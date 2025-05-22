@@ -46,6 +46,14 @@ public class DateTimeUtil {
         return xmlGregorianCalendar(str);
     }
 
+    public static boolean period (String first, String second){
+        XMLGregorianCalendar data1 = oneBoxCalendar(first);
+        XMLGregorianCalendar data2 = oneBoxCalendar(second);
+        int year = data2.getYear() - data1.getYear();
+        int month = data2.getMonth() - data1.getMonth();
+        return (year * 12 + month) < 13;
+    }
+
 
 
 

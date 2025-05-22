@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ua.univer.custodianNew.dto.*;
+import ua.univer.custodianNew.exceptions.UnprocessableEntityException;
 import ua.univer.custodianNew.util.DateTimeUtil;
 
 import java.io.*;
@@ -18,6 +19,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static ua.univer.custodianNew.util.DateTimeUtil.period;
 import static ua.univer.custodianNew.util.FileDownloadService.byteArrStorage;
 
 @RestController
@@ -71,7 +73,6 @@ public class BalanceController extends BaseController {
 
         long time = System.nanoTime();
         String methodName = STATEMENT_OF_HOLDINGS_V2;
-        //String ipAddress = form.isTest()? DEKRA_URL_80 : DEKRA_URL_PROD;
         Request request = getRequestWithHeader(methodName, form.isTest());
 
         TStatementOfHoldingsRequest statement = new TStatementOfHoldingsRequest();
@@ -99,7 +100,6 @@ public class BalanceController extends BaseController {
         form.setTest(true);
         long time = System.nanoTime();
         String methodName = STATEMENT_OF_TRANSACTION_V2;
-        //String ipAddress = form.isTest()? DEKRA_URL_80 : DEKRA_URL_PROD;
         Request request = getRequestWithHeader(methodName, form.isTest());
 
         TStatementOfTransactionsRequest statement = new TStatementOfTransactionsRequest();
@@ -175,8 +175,8 @@ public class BalanceController extends BaseController {
     @PostMapping(value = "/statementPDF")
     public ResponseEntity<String> statementPDF(@RequestBody @Valid FormStatementPDF form) {
 
-        //logger.info("Statement_of_Transaction. statementPDF. Production");
         long time = System.nanoTime();
+        if (!period(form.getDateStart(), form.getDateStop())) throw new UnprocessableEntityException("період виписки не більше 1 року");
         String methodName = STATEMENT_OF_TRANSACTION;
         logger.info("Method %s. StatementPDF. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
