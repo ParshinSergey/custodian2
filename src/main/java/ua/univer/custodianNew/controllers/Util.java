@@ -262,6 +262,53 @@ public final class Util {
         brokerAgreements.getBrokerAgreement().add(brokerAgreement);
         tnewAccountRequest.setBrokerAgreements(brokerAgreements);
 
+        // ---- блок Распорядителя Счета ----
+        if (form.getManagerLastName() != null) {
+            var controlling = new TnewAccountRequest.Controlling();
+            var subject = new TnewAccountRequest.Controlling.ControllingSubject();
+            subject.setControllingSubjectType(form.getControllingSubjectType());
+
+            var manager = new TManager();
+
+            var managerIdCode = new TManager.IdCode();
+            managerIdCode.setValue(form.getManagerIdCode());
+            manager.setIdCode(managerIdCode);
+
+            var managerName = new TManager.Name();
+            managerName.setFName(form.getManagerFirstName());
+            managerName.setLName(form.getManagerLastName());
+            managerName.setMName(form.getManagerMiddleName());
+            manager.setName(managerName);
+
+            var managerDoc = new TdocFO();
+            managerDoc.setDocSerial(form.getManagerDocSerial());
+            managerDoc.setDocNumber(form.getManagerDocNumber());
+            managerDoc.setDocDate(oneBoxCalendar(form.getManagerDocDate()));
+            managerDoc.setDocWho(form.getManagerDocWho());
+            managerDoc.setDocType(form.getManagerDocType());
+            managerDoc.setDocDatestart(oneBoxCalendar(form.getManagerDocDateStart()));
+            managerDoc.setDocDateStop(oneBoxCalendar(form.getManagerDocDateStop()));
+            managerDoc.setDocSDRnumber(form.getManagerDocSDRNumber());
+            manager.setDocFO(managerDoc);
+
+            var managerAddresses = new TManager.Addresses();
+            managerAddresses.setPostAddresses(form.getManagerPostAddress());
+            managerAddresses.setLegalAddresses(form.getManagerLegalAddress());
+            manager.setAddresses(managerAddresses);
+
+            manager.setPost(form.getManagerPost());
+            manager.setDepartment(form.getManagerDepartment());
+            manager.setPhone(form.getManagerPhone());
+            subject.setManager(manager);
+
+            subject.setDateStart(oneBoxCalendar(form.getManagerDateStart()));
+            subject.setDateStop(oneBoxCalendar(form.getManagerDateStop()));
+            subject.setReason(form.getManagerReason());
+
+            controlling.getControllingSubject().add(subject);
+            tnewAccountRequest.setControlling(controlling);
+        }
+        // ---- конец блока Распорядителя Счета ----
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setNewAccount(tnewAccountRequest);

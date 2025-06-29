@@ -47,13 +47,16 @@ public class AccountController extends BaseController {
         long time = System.nanoTime();
 
         String methodName = NEW_ACCOUNT;
-        logger.info("Method %s. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
+        /*logger.info("Method %s. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
         Request request = new Request();
 
         THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.getRequestID(), form.isTest());
         tHeaderRequest.setRequestType(methodName);
-        request.setHeader(tHeaderRequest);
+        request.setHeader(tHeaderRequest);*/
+
+        logger.info("TEST for Company !!");
+        Request request = getRequestWithHeader(methodName, form.isTest());
 
         TbodyRequest tbodyRequest = Util.convertFormToNewAccount(form);
         request.setBody(tbodyRequest);
@@ -83,8 +86,8 @@ public class AccountController extends BaseController {
     }
 
 
-    @PostMapping(value = "/TEST/getAccount")
-    public ResponseEntity<String> testGetAccount (@RequestBody @Valid FormGet form) {
+    @PostMapping(value = "/TEST/getAccountNum")
+    public ResponseEntity<String> testGetAccountNum (@RequestBody @Valid FormGet form) {
         form.setTest(true);
         return getAccountNum(form);
     }

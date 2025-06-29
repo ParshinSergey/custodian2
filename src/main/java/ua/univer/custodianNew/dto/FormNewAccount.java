@@ -1,7 +1,6 @@
 package ua.univer.custodianNew.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -183,9 +182,41 @@ public class FormNewAccount extends BaseForm{
     private String currencyFund;
     private String kopf;
 
-   /* // поле для работы Тестовых Методов
-    @Hidden
-    private boolean test;*/
+    // поля для Распорядителя Счета
+    private String controllingSubjectType;
+    @Pattern(regexp = "^\\d{10}$", message = "должно состоять из 10 цифр")
+    private String managerIdCode;
+    @Size(max = 80)
+    private String managerLastName;
+    @Size(max = 26)
+    private String managerFirstName;
+    @Size(max = 26)
+    private String managerMiddleName;
+    private String managerDocSerial;
+    private String managerDocNumber;
+    private String managerDocDate;
+    @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
+    private String managerDocWho;
+    private String managerDocType;
+    private String managerDocDateStart;
+    private String managerDocDateStop;
+    private String managerDocSDRNumber;
+    @Size(max = 80)
+    @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
+    private String managerPostAddress;
+    @Size(max = 80)
+    @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
+    private String managerLegalAddress;
+    @Size(max = 80)
+    private String managerPost;
+    @Size(max = 80)
+    private String managerDepartment;
+    private String managerPhone;
+    private String managerDateStart;
+    private String managerDateStop;
+    @Size(max = 80)
+    private String managerReason;
+
 
 
     public FormNewAccount() {
