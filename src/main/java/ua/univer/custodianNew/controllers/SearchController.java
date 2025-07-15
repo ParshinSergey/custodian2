@@ -52,7 +52,7 @@ public class SearchController extends BaseController{
         if (form.getBrokerID() != null){
             String dekraResponse = writeAndSendRequestWriteResponseToFile(request, form.ipAddress(), "SearchWithBroker");
             Responce responce = getResponceFromXml(dekraResponse);
-            Responce responceWithBroker = ResponceServise.getResponceWithBroker(responce, form.getBrokerID());
+            Responce responceWithBroker = ResponceServise.filterWithBrokers(responce, form.getBrokerID());
             logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
             return ResponseEntity.ok().body(ConverterUtil.objectToJson(responceWithBroker));
         }

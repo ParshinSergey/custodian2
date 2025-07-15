@@ -240,9 +240,6 @@ public final class Util {
         agreement.setDate(oneBoxCalendar(form.getAgreementDate()));
         agreement.setDateStart(oneBoxCalendar(form.getAgreementDateStart()));
         agreement.setDateStop(oneBoxCalendar(form.getAgreementDateStop()));
-        if (form.getAgrID() != null) {
-            agreement.setAgrID(new BigInteger(form.getAgrID().toString()));
-        }
         agreements.getAgreement().add(agreement);
         tnewAccountRequest.setAgreements(agreements);
 
@@ -256,9 +253,6 @@ public final class Util {
         brokerAgreement.setDate(oneBoxCalendar(form.getBrokerAgreementDate()));
         brokerAgreement.setDateStart(oneBoxCalendar(form.getBrokerAgreementDateStart()));
         brokerAgreement.setDateStop(oneBoxCalendar(form.getBrokerAgreementDateStop()));
-        if (form.getBrokerAgrID() != null) {
-            brokerAgreement.setAgrID(new BigInteger(form.getBrokerAgrID().toString()));
-        }
         brokerAgreements.getBrokerAgreement().add(brokerAgreement);
         tnewAccountRequest.setBrokerAgreements(brokerAgreements);
 
@@ -273,6 +267,14 @@ public final class Util {
             var managerIdCode = new TManager.IdCode();
             managerIdCode.setValue(form.getManagerIdCode());
             manager.setIdCode(managerIdCode);
+
+            var managerRefusingCode = new TManager.RefusingCode();
+            managerRefusingCode.setValue(form.isManagerRefusingCode());
+            manager.setRefusingCode(managerRefusingCode);
+
+            var managerCountry = new TManager.Country();
+            managerCountry.setValue(form.getManagerCountry());
+            manager.setCountry(managerCountry);
 
             var managerName = new TManager.Name();
             managerName.setFName(form.getManagerFirstName());
@@ -299,6 +301,15 @@ public final class Util {
             manager.setPost(form.getManagerPost());
             manager.setDepartment(form.getManagerDepartment());
             manager.setPhone(form.getManagerPhone());
+            manager.setEMail(form.getManagerEMail());
+
+            var managerReestrOwner = new TManager.ReestrOwner();
+            managerReestrOwner.setEMail(form.getManagerEMail());
+            managerReestrOwner.setMobilePhone(form.getManagerPhone());
+            manager.setReestrOwner(managerReestrOwner);
+
+            manager.setComment(form.getManagerComment());
+
             subject.setManager(manager);
 
             subject.setDateStart(oneBoxCalendar(form.getManagerDateStart()));

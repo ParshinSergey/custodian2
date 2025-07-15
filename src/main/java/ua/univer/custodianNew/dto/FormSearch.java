@@ -21,7 +21,7 @@ public class FormSearch extends BaseForm{
     @Positive
     private String maxRecord;
     private String type;
-    @Positive
+    //@Positive
     private String brokerID;
 
 

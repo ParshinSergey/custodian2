@@ -166,14 +166,12 @@ public class FormNewAccount extends BaseForm{
     private String agreementDate;
     private String agreementDateStart;
     private String agreementDateStop;
-    private Integer agrID;
 
     private Integer brokerCustomerID;
     private String brokerAgreementNumber;
     private String brokerAgreementDate;
     private String brokerAgreementDateStart;
     private String brokerAgreementDateStop;
-    private Integer brokerAgrID;
 
     // поля для Юридических лиц
     private String shortNameInternational;
@@ -186,11 +184,13 @@ public class FormNewAccount extends BaseForm{
     private String controllingSubjectType;
     @Pattern(regexp = "^\\d{10}$", message = "должно состоять из 10 цифр")
     private String managerIdCode;
-    @Size(max = 80)
+    private boolean managerRefusingCode;
+    private String managerCountry;
+    @Size(max = 150)
     private String managerLastName;
-    @Size(max = 26)
+    @Size(max = 150)
     private String managerFirstName;
-    @Size(max = 26)
+    @Size(max = 150)
     private String managerMiddleName;
     private String managerDocSerial;
     private String managerDocNumber;
@@ -201,17 +201,19 @@ public class FormNewAccount extends BaseForm{
     private String managerDocDateStart;
     private String managerDocDateStop;
     private String managerDocSDRNumber;
-    @Size(max = 80)
+    @Size(max = 300)
     @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
     private String managerPostAddress;
-    @Size(max = 80)
+    @Size(max = 300)
     @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
     private String managerLegalAddress;
-    @Size(max = 80)
+    @Size(max = 100)
     private String managerPost;
-    @Size(max = 80)
+    @Size(max = 100)
     private String managerDepartment;
     private String managerPhone;
+    private String managerEMail;
+    private String managerComment;
     private String managerDateStart;
     private String managerDateStop;
     @Size(max = 80)

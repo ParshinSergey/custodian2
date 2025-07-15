@@ -30,11 +30,11 @@ public class DeckraServiceController extends BaseController{
     }
 
     @GetMapping(value = "/echo", consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> echo (@RequestBody String str){
+    public String echo ( String str){
 
         long time = System.nanoTime();
         String methodName = "Echo";
-        Request request = getRequestWithHeader(methodName, true);
+        Request request = getRequestWithHeader(methodName, false);
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         TbodyRequest.Echo rrr = new TbodyRequest.Echo();
@@ -43,7 +43,19 @@ public class DeckraServiceController extends BaseController{
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, DEKRA_URL_80, methodName);
+        String response = getResponseEntity(time, request, DEKRA_URL_PROD, methodName).getBody();
+
+        return """
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <title>Метод Эхо</title>
+                  </head>
+                  <body>
+                    <p>%s</p>
+                  </body>
+                </html>
+                """.formatted(response);
 
     }
 
