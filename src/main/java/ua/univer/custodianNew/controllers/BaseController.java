@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import ua.univer.custodianNew.exceptions.DekraException;
+import ua.univer.custodianNew.exceptions.UnprocessableEntityException;
 import ua.univer.custodianNew.util.ConverterUtil;
 
 import java.io.*;
@@ -64,7 +65,7 @@ public class BaseController {
                     message = "Unidentified JAXB error";
                 }
             }
-            System.out.println(message);
+            throw new UnprocessableEntityException(message);
         }
     }
 
@@ -80,7 +81,7 @@ public class BaseController {
                     message = "Unidentified JAXB error";
                 }
             }
-            System.out.println(message);
+            throw new UnprocessableEntityException(message);
         }
     }
 

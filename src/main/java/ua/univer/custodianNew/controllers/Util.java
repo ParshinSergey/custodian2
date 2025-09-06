@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -321,6 +322,12 @@ public final class Util {
         }
         // ---- конец блока Распорядителя Счета ----
 
+        var segregated = new TnewAccountRequest.SegregatedAccount();
+        segregated.setNbu(form.isSegregatedNBU());
+        segregated.setNdu(form.isSegregatedNDU());
+        tnewAccountRequest.setSegregatedAccount(segregated);
+
+
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setNewAccount(tnewAccountRequest);
 
@@ -438,13 +445,14 @@ public final class Util {
         result.setAccount(form.getAccount());
         result.setCustomerID(origin.getCustomerID());
 
-        String updatedCnum = form.getCnum();
+        // не будем изменять CNUM. Из-за операций Update и ранее неправильного cnum.
+     /*   String updatedCnum = form.getCnum();
         if (updatedCnum != null && (origin.getCNUM() == null || !updatedCnum.trim().equalsIgnoreCase(origin.getCNUM().getValue()))){
             var cnum = new TupdateCustomer.CNUM();
             cnum.setValue(updatedCnum);
             cnum.setChanged(true);
             result.setCNUM(cnum);
-        }
+        }*/
 
         String updatedCountry = form.getCountry();
         if (updatedCountry != null && !updatedCountry.trim().equalsIgnoreCase(origin.getCountry().getValue())){
@@ -551,7 +559,12 @@ public final class Util {
         }
 
         var bankDetails = new TupdateCustomer.BankDetails();
-        List<TBankDetail> originListBankDetail = origin.getBankDetails().getBankDetail();
+        List<TBankDetail> originListBankDetail = null;
+        if (origin.getBankDetails() == null) {
+            originListBankDetail = new ArrayList<TBankDetail>();
+        } else {
+            originListBankDetail = origin.getBankDetails().getBankDetail();
+        }
         addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo(), form.getIban(), form.getCardAccount(), form.getBankName(),
                 form.getCurrency(), form.getBic(), form.getLei(), form.isUse4Income(), form.getType(), form.getCorrBankIban(), form.getCorrBankName(), form.getCorrBankBic());
         addUpdatedBankDetail(bankDetails, originListBankDetail, form.getMfo1(), form.getIban1(), form.getCardAccount1(), form.getBankName1(),
@@ -563,6 +576,7 @@ public final class Util {
         result.setBankDetails(bankDetails);
 
         var contact = new TupdateCustomer.Contact();
+        var ro = new TContact.ReestrOwner();
         String updatedPhone = form.getPhone();
         if (updatedPhone != null && (origin.getContact().getPhone() == null || !updatedPhone.trim().equalsIgnoreCase(origin.getContact().getPhone().getValue()))) {
             var phone = new TContact.Phone();
@@ -576,6 +590,10 @@ public final class Util {
             mobilePhone.setValue(updatedMobilePhone);
             mobilePhone.setChanged(true);
             contact.setMobilePhone(mobilePhone);
+            var roMobPhone = new TContact.ReestrOwner.MobilePhone();
+            roMobPhone.setValue(updatedMobilePhone);
+            roMobPhone.setChanged(true);
+            ro.setMobilePhone(roMobPhone);
         }
         String updatedMailGeneral = form.geteMailGeneral();
         if (origin.getContact().getEMails() == null ||
@@ -598,17 +616,22 @@ public final class Util {
             eMailStatement.setChanged(true);
             eMails.setEMailStatement(eMailStatement);
             contact.setEMails(eMails);
+            var roEmail = new TContact.ReestrOwner.EMail();
+            roEmail.setValue(updatedMailGeneral);
+            roEmail.setChanged(true);
+            ro.setEMail(roEmail);
         }
+        contact.setReestrOwner(ro);
         result.setContact(contact);
 
         var birthInfo = new TupdateCustomer.BirthInfo();
         String updatedBirthPlace = form.getBirthPlace();
-        if (updatedBirthPlace != null && !updatedBirthPlace.trim().equalsIgnoreCase(origin.getBirthInfo().getBirthPlace())){
+        if (updatedBirthPlace != null && (origin.getBirthInfo() == null || !updatedBirthPlace.trim().equalsIgnoreCase(origin.getBirthInfo().getBirthPlace()))){
             birthInfo.setBirthPlace(updatedBirthPlace.trim());
             birthInfo.setChanged(true);
         }
         XMLGregorianCalendar updatedBirthDate = oneBoxCalendar(form.getBirthDate());
-        if (updatedBirthDate != null && (origin.getBirthInfo().getBirthDate() == null || updatedBirthDate.compare(origin.getBirthInfo().getBirthDate()) != 0)){
+        if (updatedBirthDate != null && (origin.getBirthInfo() == null || origin.getBirthInfo().getBirthDate() == null || updatedBirthDate.compare(origin.getBirthInfo().getBirthDate()) != 0)){
             birthInfo.setBirthDate(updatedBirthDate);
             birthInfo.setChanged(true);
         }

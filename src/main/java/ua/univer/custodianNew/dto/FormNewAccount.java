@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class FormNewAccount extends BaseForm{
 
-    @NotBlank
+    //@NotBlank
     @DecimalMax(value = "100000000")
     private String requestID;
 
@@ -33,7 +33,7 @@ public class FormNewAccount extends BaseForm{
     private String countryTax;
 
     @NotBlank
-    @Pattern(regexp = "^\\d{8}|\\d{10}$", message = "должно состоять из 8 или 10 цифр")
+    //@Pattern(regexp = "^\\d{8}|\\d{10}$", message = "должно состоять из 8 или 10 цифр")
     private String idCode;
 
     @NotBlank
@@ -218,6 +218,10 @@ public class FormNewAccount extends BaseForm{
     private String managerDateStop;
     @Size(max = 80)
     private String managerReason;
+
+    // сегрегированные счета
+    private boolean segregatedNDU;
+    private boolean segregatedNBU;
 
 
 

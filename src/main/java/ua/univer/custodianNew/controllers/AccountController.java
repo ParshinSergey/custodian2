@@ -21,7 +21,7 @@ import java.net.http.HttpClient;
 @RequestMapping(value = "/api/request", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController extends BaseController {
 
-    private static final String NEW_ACCOUNT = "newAccount";
+    private static final String NEW_ACCOUNT = "NewAccount";
     private static final String GET_ACCOUNT_NUM = "GetAccountNum";
     private static final String UPDATE_CUSTOMER = "UpdateCustomerV2";
     private static final String ACCOUNT = "Account";
@@ -33,7 +33,7 @@ public class AccountController extends BaseController {
     }
 
 
-    @PostMapping(value = "/TEST/" + NEW_ACCOUNT)
+    @PostMapping(value = "/TEST/newAccount")
     public ResponseEntity<String> testNewAccount (@RequestBody @Valid FormNewAccount form) {
         form.setTest(true);
         return newAccount(form);
@@ -45,17 +45,7 @@ public class AccountController extends BaseController {
     public ResponseEntity<String> newAccount (@RequestBody @Valid FormNewAccount form) {
 
         long time = System.nanoTime();
-
         String methodName = NEW_ACCOUNT;
-        /*logger.info("Method %s. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
-
-        Request request = new Request();
-
-        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.getRequestID(), form.isTest());
-        tHeaderRequest.setRequestType(methodName);
-        request.setHeader(tHeaderRequest);*/
-
-        logger.info("TEST for Company !!");
         Request request = getRequestWithHeader(methodName, form.isTest());
 
         TbodyRequest tbodyRequest = Util.convertFormToNewAccount(form);
@@ -66,10 +56,10 @@ public class AccountController extends BaseController {
 
 
     @Operation(summary = "Відкриття рахунку")
-    @PostMapping(value = "/" + NEW_ACCOUNT + "FO")
+    @PostMapping(value = "/newAccountFO")
     public ResponseEntity<String> getNewAccountFO (@RequestBody @Valid FormNewAccount form) {
 
-        logger.info("Method NewAccount. Production");
+        logger.info("Method NewAccount. Production. OLD VERSION.");
         long time = System.nanoTime();
         String methodName = NEW_ACCOUNT;
 

@@ -51,7 +51,7 @@ public class DateTimeUtil {
         XMLGregorianCalendar data2 = oneBoxCalendar(second);
         int year = data2.getYear() - data1.getYear();
         int month = data2.getMonth() - data1.getMonth();
-        return (year * 12 + month) < 13;
+        return (year * 12 + month) < 25;
     }
 
 
