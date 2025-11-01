@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>ua.univer</groupId>
 	<artifactId>custodianNew</artifactId>
-	<version>1.2.1</version>
+	<version>1.2.2</version>
 	<name>custodianNew</name>
 	<description>External System for Custodian2016 API</description>
 	<properties>
