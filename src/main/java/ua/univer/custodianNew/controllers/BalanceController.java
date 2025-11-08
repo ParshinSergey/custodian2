@@ -177,7 +177,7 @@ public class BalanceController extends BaseController {
 
         long time = System.nanoTime();
         if (!period(form.getDateStart(), form.getDateStop())) throw new UnprocessableEntityException("період виписки не більше 2 рокiв");
-        String methodName = STATEMENT_OF_TRANSACTION;
+        String methodName = STATEMENT_OF_TRANSACTION_V2;
         logger.info("Method %s. StatementPDF. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
         Request request = new Request();
@@ -202,6 +202,7 @@ public class BalanceController extends BaseController {
         }
         statement.setDateStart(DateTimeUtil.oneBoxCalendar(form.getDateStart()));
         statement.setDateStop(DateTimeUtil.oneBoxCalendar(form.getDateStop()));
+        statement.setFull(form.isFull());
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setStatementOfTransactionsRequest(statement);
@@ -247,7 +248,7 @@ public class BalanceController extends BaseController {
 
         form.setTest(true);
         long time = System.nanoTime();
-        String methodName = STATEMENT_OF_TRANSACTION;
+        String methodName = STATEMENT_OF_TRANSACTION_V2;
         logger.info("Method %s. getStatementPDF. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
         Request request = new Request();
@@ -272,6 +273,7 @@ public class BalanceController extends BaseController {
         }
         statement.setDateStart(DateTimeUtil.oneBoxCalendar(form.getDateStart()));
         statement.setDateStop(DateTimeUtil.oneBoxCalendar(form.getDateStop()));
+        statement.setFull(form.isFull());
 
         TbodyRequest tbodyRequest = new TbodyRequest();
         tbodyRequest.setStatementOfTransactionsRequest(statement);

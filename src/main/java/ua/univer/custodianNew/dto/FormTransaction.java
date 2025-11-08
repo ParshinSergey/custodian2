@@ -28,6 +28,8 @@ public class FormTransaction extends BaseForm{
     private boolean commitAfterRegistr;
     // private String statementInResponse;
     private boolean requestInResponse;
+    private String transationType;
+    private boolean individualBLK;
 */
 
     private String mdo;
@@ -44,6 +46,10 @@ public class FormTransaction extends BaseForm{
     private String brokerIdCode;
     private String brokerName;
     private String agregateAccountID;
+    private String participantMFO;
+    private String participantIban;
+    private String participantCode;
+    private String finalBeneficiary;
 
     private String mdo2;
     @NotBlank
@@ -59,6 +65,10 @@ public class FormTransaction extends BaseForm{
     private String brokerIdCode2;
     private String brokerName2;
     private String agregateAccountID2;
+    private String participantMFO2;
+    private String participantIban2;
+    private String participantCode2;
+    private String finalBeneficiary2;
 
 
 

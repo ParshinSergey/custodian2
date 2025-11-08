@@ -26,7 +26,6 @@ public final class Util {
 
     private static final String sourceAPP_prod = "E0D397FA-146D-434B-89E0-EA9FF9CDCBC5";
     private static final String sourceAPP_test = "1DD4EC32-45DB-404A-A123-6F657895E502";
-    private static final String sourceAPP_80 = "3000350A-429D-4632-81B7-B31C02C7D980";
 
 
     private Util() {
@@ -498,7 +497,7 @@ public final class Util {
         }
         result.setName(name);
 
-        // Меняется только adressFree. Чтобы не затирать в Декре дома, улицы и т.п.
+        // Меняется только addressFree. Чтобы не затирать в Декре дома, улицы и т.п.
         if (form.getAddressFree() != null){
             String phrase = "фактична адреса згідно довідки ВПО";
             String[] arrAddress = form.getAddressFree().split(phrase, 2);
@@ -559,9 +558,9 @@ public final class Util {
         }
 
         var bankDetails = new TupdateCustomer.BankDetails();
-        List<TBankDetail> originListBankDetail = null;
+        List<TBankDetail> originListBankDetail;
         if (origin.getBankDetails() == null) {
-            originListBankDetail = new ArrayList<TBankDetail>();
+            originListBankDetail = new ArrayList<>();
         } else {
             originListBankDetail = origin.getBankDetails().getBankDetail();
         }

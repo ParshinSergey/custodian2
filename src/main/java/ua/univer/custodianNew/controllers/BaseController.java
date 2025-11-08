@@ -20,14 +20,16 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BaseController {
 
     public static final String DEKRA_URL_80 = "https://10.1.2.80/API_BP/cp_api.dll";
     public static final String DEKRA_URL_PROD = "https://10.1.2.204/API_BP/cp_api.dll";
-    public static final String DEKRA_URL_FAKE = "http://localhost:8081/api/service/result";
 
     Logger logger = LoggerFactory.getLogger(BaseController.class);
+    ReentrantLock lockMarch = new ReentrantLock();
+    ReentrantLock lockUnMarsh = new ReentrantLock();
 
     @Autowired
     private Unmarshaller unmarshaller;
@@ -53,23 +55,9 @@ public class BaseController {
     }
 
 
-    protected void saveToFileXml(Request request, File file) {
-        try {
-            marshaller.marshal(request, file);
-        }
-        catch (JAXBException ex) {
-            String message = ex.getMessage();
-            if (message == null) {
-                message = ex.getCause().getMessage();
-                if (message == null) {
-                    message = "Unidentified JAXB error";
-                }
-            }
-            throw new UnprocessableEntityException(message);
-        }
-    }
-
     protected void saveXmlToWriter(Request request, Writer writer) {
+
+        lockMarch.lock();
         try {
             marshaller.marshal(request, writer);
         }
@@ -83,7 +71,11 @@ public class BaseController {
             }
             throw new UnprocessableEntityException(message);
         }
+        finally {
+            lockMarch.unlock();
+        }
     }
+
 
     protected String writeAndSendRequestWriteResponseToFile(Request request, String ipAddress, String prefix) {
 
@@ -130,12 +122,17 @@ public class BaseController {
 
 
     protected Responce getResponceFromXml(String dekraResponse) {
+
         Responce responce;
+        lockUnMarsh.lock();
         try(StringReader reader = new StringReader(dekraResponse)){
             responce = (Responce) unmarshaller.unmarshal(reader);
         }
         catch (JAXBException e) {
             throw new DekraException("Error unmarshalling. DekraResponse is: " + dekraResponse);
+        }
+        finally {
+            lockUnMarsh.unlock();
         }
         return responce;
     }

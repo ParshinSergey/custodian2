@@ -18,5 +18,6 @@ public class FormStatement extends BaseForm{
     private String account;
     private String isin;
     private String depositary;
+    private boolean full;
 
 }

@@ -18,7 +18,7 @@ public class DoubleAdapter extends XmlAdapter<String, Double> {
     }
 
     @Override
-    public String marshal(Double v) throws Exception {
+    public String marshal(Double v) {
         if (v == null) {
             return null;
         }

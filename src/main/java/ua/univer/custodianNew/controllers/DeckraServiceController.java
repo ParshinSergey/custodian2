@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.http.HttpClient;
