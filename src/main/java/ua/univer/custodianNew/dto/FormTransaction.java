@@ -1,6 +1,7 @@
 package ua.univer.custodianNew.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,9 +24,12 @@ public class FormTransaction extends BaseForm{
     private String agreementCurrency;
     private Integer agreementType;
     private String agreementTypeName;
-/*
+
+
+    @Pattern(regexp = "AUTO|MANUAL|SYSTEM")
     private String transactionProcessing;
     private boolean commitAfterRegistr;
+/*
     // private String statementInResponse;
     private boolean requestInResponse;
     private String transationType;

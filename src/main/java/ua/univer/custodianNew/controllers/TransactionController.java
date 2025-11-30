@@ -1,6 +1,7 @@
 package ua.univer.custodianNew.controllers;
 
 import dmt.custodian2016.*;
+import jakarta.validation.Valid;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class TransactionController extends BaseController{
 
     //@Operation(summary = "Выполнение транзакции")
     @PostMapping(value = "/TEST/transaction")
-    public ResponseEntity<String> transaction(@RequestBody FormTransaction form) {
+    public ResponseEntity<String> transaction(@RequestBody @Valid FormTransaction form) {
 
         form.setTest(true);
         long time = System.nanoTime();
@@ -51,7 +52,7 @@ public class TransactionController extends BaseController{
         transaction.setISIN(tisin);
         transaction.setQuantity(form.getQuantity());
 
-        var agreement = new TTransactionHeaderRequest.Agreement();
+        var agreement = new TTransactionRequest.Agreement();
         agreement.setNumber(form.getNumber());
         agreement.setDate(oneBoxCalendar(form.getDate()));
         agreement.setAgreementCost(BigDecimal.valueOf(form.getAgreementCost()));
@@ -59,6 +60,11 @@ public class TransactionController extends BaseController{
         agreement.setAgreementType(BigInteger.valueOf(form.getAgreementType()));
         agreement.setAgreementTypeName(form.getAgreementTypeName());
         transaction.setAgreement(agreement);
+
+        if (form.getTransactionProcessing() != null){
+            transaction.setTransactionProcessing(TTransactionProcessing.valueOf(form.getTransactionProcessing()));
+        }
+        transaction.setCommitAfterRegistr(form.isCommitAfterRegistr());
 
         TParticipant participantSource = new TParticipant();
         participantSource.setMDO(form.getMdo());

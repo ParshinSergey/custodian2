@@ -33,6 +33,7 @@ public class BalanceController extends BaseController {
 
     private static final int OUTPUT_FORMAT_PDF = 0;
     private static final int STATEMENT_TEMPLATE = 191;
+    private static final int BALANCE_TEMPLATE_WITH_FACSIMILE = 203;
     private static final int STATEMENT_TEMPLATE_WITH_FACSIMILE = 204;
 
     public BalanceController(Marshaller marshaller, HttpClient httpClient) {
@@ -92,6 +93,75 @@ public class BalanceController extends BaseController {
 
         return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
+
+
+
+    @Operation(summary = "Виписка про стан рахунку у форматі PDF")
+    @PostMapping(value = "/balancePDF")
+    public ResponseEntity<String> balancePDF(@RequestBody @Valid FormBalancePDF form) {
+
+        long time = System.nanoTime();
+        String methodName = STATEMENT_OF_HOLDINGS_V2;
+        logger.info("Method %s. BalancePDF. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
+
+        Request request = new Request();
+
+        THeaderRequest tHeaderRequest = Util.getHeaderRequest(form.isTest());
+        tHeaderRequest.setRequestType(methodName);
+        var binary = new THeaderRequest.Binary();
+        binary.setBinary(true);
+        binary.setTemplate(BALANCE_TEMPLATE_WITH_FACSIMILE);
+        binary.setOutputFormat(OUTPUT_FORMAT_PDF);
+        tHeaderRequest.setBinary(binary);
+        request.setHeader(tHeaderRequest);
+
+        TStatementOfHoldingsRequest statement = new TStatementOfHoldingsRequest();
+        statement.setAccount(form.getAccount());
+        if (form.getIsin() != null) {
+            var tisin = new TISIN();
+            tisin.setISIN(form.getIsin());
+            tisin.setDepositary(form.getDepositary());
+            statement.setISIN(tisin);
+        }
+        statement.setDateState(DateTimeUtil.oneBoxCalendar(form.getDateState()));
+
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setStatementOfHoldingsRequest(statement);
+
+        request.setBody(tbodyRequest);
+
+        String dekraResponse = writeAndSendRequest(request, form.ipAddress(), "BalancePDF");
+        Responce responce = getResponceFromXml(dekraResponse);
+        String b64 = responce.getBody().getBinary();
+
+        byte[] decoded = org.apache.commons.codec.binary.Base64.decodeBase64(b64);
+        String fileName = String.format("%s_%s_%s.pdf", form.getAccount(), form.getIsin(), form.getDateState());
+        byteArrStorage.put(fileName, decoded);
+
+        String customOrder = "http://10.1.2.80:8081/api/downloadPDF/" + fileName;
+        String jsonStr = """
+                {
+                "login": "APIRest",
+                "password": "679271971e515557305cbb263e89e145",
+                "orderid": "%s",
+                "%s": "%s",
+                "fastdownload": 1
+                }
+                """.formatted(form.getOrderId(), form.getFieldName(), customOrder);
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create("https://univer.1b.app/api/orders/update/?dataFromBody=1"))
+                .POST(HttpRequest.BodyPublishers.ofString(jsonStr))
+                .header("Content-Type", "application/json")
+                .build();
+
+        httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        logger.info("time is " + (System.nanoTime() - time) / 1000000 + " ms");
+
+        return ResponseEntity.ok().body("Order updated, and file can be downloaded from " + customOrder);
+    }
+
 
 
     @PostMapping(value = "/TEST/statementV2")
