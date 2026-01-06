@@ -12,7 +12,7 @@ public class BaseForm {
 
     private static final String DEKRA_URL_PROD = "https://10.1.2.204/API_BP/cp_api.dll";
     private static final String DEKRA_URL_80 = "https://10.1.2.80/API_BP/cp_api.dll";
-    static final String KEYBOARD_SYMBOLS = "^[\\u0020-\\u007EА-Яа-яёЁЇїІіЄєҐґ№\\s]+$|^$";
+    public static final String KEYBOARD_SYMBOLS = "^[\\u0020-\\u007EА-Яа-яёЁЇїІіЄєҐґ№\\u000A\\u000D]+$|^$";
 
     // поле для работы Тестовых Методов
     @Hidden

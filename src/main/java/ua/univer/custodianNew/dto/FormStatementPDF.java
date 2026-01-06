@@ -14,6 +14,8 @@ public class FormStatementPDF extends FormStatementFile {
     @NotBlank
     private String fieldName;
 
+    private boolean longPeriod;
+
     public FormStatementPDF() {
         this.setOutputFormat(0);
     }

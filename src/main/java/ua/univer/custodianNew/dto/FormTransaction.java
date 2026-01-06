@@ -1,6 +1,7 @@
 package ua.univer.custodianNew.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class FormTransaction extends BaseForm{
     private String date;
     private double agreementCost;
     private String agreementCurrency;
+    @NotNull
     private Integer agreementType;
     private String agreementTypeName;
 

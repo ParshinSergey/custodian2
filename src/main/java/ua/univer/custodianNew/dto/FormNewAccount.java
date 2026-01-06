@@ -55,7 +55,7 @@ public class FormNewAccount extends BaseForm{
     private String house;
     private String flat;
     @Size(max = 256)
-    @Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
+    //@Pattern(regexp = KEYBOARD_SYMBOLS, message = "- содержит недопустимые символы")
     private String addressFree;
 
     private String docSerial;

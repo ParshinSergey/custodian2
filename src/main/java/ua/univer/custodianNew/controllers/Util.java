@@ -2,9 +2,11 @@ package ua.univer.custodianNew.controllers;
 
 
 import dmt.custodian2016.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import ua.univer.custodianNew.dto.*;
 import ua.univer.custodianNew.exceptions.DekraException;
+import ua.univer.custodianNew.exceptions.UnprocessableEntityException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -22,10 +24,11 @@ import java.util.UUID;
 
 import static ua.univer.custodianNew.config.AppConfiguration.DIRECTORY;
 
+@Slf4j
 public final class Util {
 
     private static final String sourceAPP_prod = "E0D397FA-146D-434B-89E0-EA9FF9CDCBC5";
-    private static final String sourceAPP_test = "1DD4EC32-45DB-404A-A123-6F657895E502";
+    public static final String sourceAPP_test = "1DD4EC32-45DB-404A-A123-6F657895E502";
 
 
     private Util() {
@@ -112,8 +115,16 @@ public final class Util {
 
         var addresses = new TCustomer.Addresses();
         if (form.getAddressFree() != null) {
+           /* if (!form.getAddressFree().matches(BaseForm.KEYBOARD_SYMBOLS)){
+                log.warn("idCode = {}", form.getIdCode());
+                log.warn(form.getAddressFree());
+                throw new UnprocessableEntityException("addressFree - содержит недопустимые символы");
+            }*/
+            //String cleanAddress = form.getAddressFree().replaceAll("\n", " ");
+            String cleanAddress = keyBoardsSymbol(form.getAddressFree());
+
             String phrase = "фактична адреса згідно довідки ВПО";
-            String[] arrAddress = form.getAddressFree().split(phrase, 2);
+            String[] arrAddress = cleanAddress.split(phrase, 2);
             Taddress address = new Taddress();
             address.setAddressType(TAddressType.LEGAL);
             address.setCountry(form.getCountryAdr());
@@ -499,8 +510,10 @@ public final class Util {
 
         // Меняется только addressFree. Чтобы не затирать в Декре дома, улицы и т.п.
         if (form.getAddressFree() != null){
+            // заморочка с символом переноса строки
+            String cleanAddress = keyBoardsSymbol(form.getAddressFree());
             String phrase = "фактична адреса згідно довідки ВПО";
-            String[] arrAddress = form.getAddressFree().split(phrase, 2);
+            String[] arrAddress = cleanAddress.split(phrase, 2);
             List<Taddress> listAddress = origin.getAddresses().getAddress();
             var addressesRes = new TupdateCustomer.Addresses();
             boolean find = false;
@@ -638,6 +651,14 @@ public final class Util {
 
 
         return result;
+    }
+
+    private static String keyBoardsSymbol(String form) {
+        if (!form.matches(BaseForm.KEYBOARD_SYMBOLS)) {
+            log.warn(form);
+            throw new UnprocessableEntityException("addressFree - содержит недопустимые символы");
+        }
+        return form.replaceAll("\\R", " ");
     }
 
 

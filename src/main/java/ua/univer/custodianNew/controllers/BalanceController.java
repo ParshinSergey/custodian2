@@ -246,7 +246,9 @@ public class BalanceController extends BaseController {
     public ResponseEntity<String> statementPDF(@RequestBody @Valid FormStatementPDF form) {
 
         long time = System.nanoTime();
-        if (!period(form.getDateStart(), form.getDateStop())) throw new UnprocessableEntityException("період виписки не більше 2 рокiв");
+        if (!form.isLongPeriod()){
+            if (!period(form.getDateStart(), form.getDateStop())) throw new UnprocessableEntityException("період виписки не більше 2 рокiв");
+        }
         String methodName = STATEMENT_OF_TRANSACTION_V2;
         logger.info("Method %s. StatementPDF. %s".formatted(methodName, form.isTest() ? "TEST" : "Production"));
 
