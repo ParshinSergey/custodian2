@@ -187,9 +187,13 @@ public class TransactionController extends BaseController{
         var agreement = new TTransactionRequest.Agreement();
         agreement.setNumber(form.getNumber());
         agreement.setDate(oneBoxCalendar(form.getDate()));
-        agreement.setAgreementCost(BigDecimal.valueOf(form.getAgreementCost()));
+        if (form.getAgreementCost() != null){
+            agreement.setAgreementCost(BigDecimal.valueOf(form.getAgreementCost()));
+        }
         agreement.setAgreementCurrency(form.getAgreementCurrency());
-        agreement.setAgreementType(BigInteger.valueOf(form.getAgreementType()));
+        if (form.getAgreementType() != null){
+            agreement.setAgreementType(BigInteger.valueOf(form.getAgreementType()));
+        }
         agreement.setAgreementTypeName(form.getAgreementTypeName());
         transaction.setAgreement(agreement);
 

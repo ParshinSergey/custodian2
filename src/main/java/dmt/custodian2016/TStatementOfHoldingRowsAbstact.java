@@ -8,6 +8,7 @@
 
 package dmt.custodian2016;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlSeeAlso;
@@ -32,6 +33,7 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * 
  */
+@JsonDeserialize(as=TStatementOfHoldingRowsV2.class)
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TStatement_of_Holding_rows_abstact")
 @XmlSeeAlso({

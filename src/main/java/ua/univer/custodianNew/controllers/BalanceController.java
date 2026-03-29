@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ua.univer.custodianNew.dto.*;
 import ua.univer.custodianNew.exceptions.UnprocessableEntityException;
+import ua.univer.custodianNew.util.ConverterUtil;
 import ua.univer.custodianNew.util.DateTimeUtil;
 
 import java.io.*;
@@ -18,6 +19,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 import static ua.univer.custodianNew.util.DateTimeUtil.period;
 import static ua.univer.custodianNew.util.FileDownloadService.byteArrStorage;
@@ -66,6 +68,15 @@ public class BalanceController extends BaseController {
 
         return getResponseEntity(time, request, form.ipAddress(), methodName);
     }
+
+
+
+    @PostMapping(value = "/TEST/accountV2")
+    public ResponseEntity<String> testBalanceAccV2(@RequestBody @Valid FormBalance form) {
+        form.setTest(true);
+        return balanceAccV2(form);
+    }
+
 
 
     @Operation(summary = "Виписка про стан рахунку (V2)")
@@ -195,7 +206,7 @@ public class BalanceController extends BaseController {
 
 
     @PostMapping(value = "/TEST/statementBinary")
-    public ResponseEntity<String> testStatementBinary(@RequestBody @Valid FormStatementFile form) throws IOException {
+    public ResponseEntity<String> testStatementBinary(@RequestBody @Valid FormStatementFile form) {
         form.setTest(true);
         return statementBinary(form);
     }
@@ -395,6 +406,41 @@ public class BalanceController extends BaseController {
 
         return ResponseEntity.ok().body("Order updated, and file can be downloaded from " + customOrder);
 
+    }
+
+
+
+    @PostMapping(value = "/viewIsin", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> strange(@RequestBody @Valid FormBalance form) {
+
+        logger.info("View ISIN");
+        String account = form.getAccount();
+        String isin;
+        if (form.getIsin() != null){
+            isin = form.getIsin();
+        }
+        else throw new UnprocessableEntityException("ISIN не должно быть пустым !!");
+        String code427000 = "";
+        String code410000 = "";
+        String unknownCode = "";
+
+        ResponseEntity<String> stringResponseEntity = balanceAccV2(form);
+        String jsonStr = stringResponseEntity.getBody();
+        Responce responce = ConverterUtil.jsonToObject(jsonStr, Responce.class);
+        TbodyResponce body = responce.getBody();
+        TStatementOfHoldingRowsV2 rows = (TStatementOfHoldingRowsV2) body.getStatementOfHoldings().getRows();
+        List<TStatementOfHoldingRowV2> rowList = rows.getRow();
+        for (var row : rowList) {
+            String code = row.getBalAccount().getCode();
+            switch (code){
+                case "427000": code427000 = String.valueOf(row.getQuantity()); break;
+                case "410000": code410000 = String.valueOf(row.getQuantity()); break;
+                default: unknownCode = String.valueOf(row.getQuantity()); break;
+            }
+        }
+        String answer = "{\"account\": \"%s\",\"isin\": \"%s\",\"code427000\": \"%s\",\"code410000\": \"%s\",\"unknownCode\": \"%s\"}".formatted(account, isin, code427000, code410000, unknownCode);
+
+        return ResponseEntity.ok(answer);
     }
 
 

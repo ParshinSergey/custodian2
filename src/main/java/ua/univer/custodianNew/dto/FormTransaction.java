@@ -21,7 +21,7 @@ public class FormTransaction extends BaseForm{
     private String number;
     @NotBlank
     private String date;
-    private double agreementCost;
+    private Double agreementCost;
     private String agreementCurrency;
     @NotNull
     private Integer agreementType;
