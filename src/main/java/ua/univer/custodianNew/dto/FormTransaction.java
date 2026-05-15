@@ -31,12 +31,15 @@ public class FormTransaction extends BaseForm{
     @Pattern(regexp = "AUTO|MANUAL|SYSTEM")
     private String transactionProcessing;
     private boolean commitAfterRegistr;
-/*
+
     // private String statementInResponse;
+
     private boolean requestInResponse;
-    private String transationType;
-    private boolean individualBLK;
-*/
+
+    @Pattern(regexp = "FOP|DVP|BLK")
+    private String transactionType;
+
+    // private boolean individualBLK;
 
     private String mdo;
     @NotBlank

@@ -27,7 +27,7 @@ import static ua.univer.custodianNew.config.AppConfiguration.DIRECTORY;
 @Slf4j
 public final class Util {
 
-    private static final String sourceAPP_prod = "E0D397FA-146D-434B-89E0-EA9FF9CDCBC5";
+    public static final String sourceAPP_prod = "E0D397FA-146D-434B-89E0-EA9FF9CDCBC5";
     public static final String sourceAPP_test = "1DD4EC32-45DB-404A-A123-6F657895E502";
 
 
@@ -589,6 +589,7 @@ public final class Util {
 
         var contact = new TupdateCustomer.Contact();
         var ro = new TContact.ReestrOwner();
+        boolean roBoolean = false;
         String updatedPhone = form.getPhone();
         if (updatedPhone != null && (origin.getContact().getPhone() == null || !updatedPhone.trim().equalsIgnoreCase(origin.getContact().getPhone().getValue()))) {
             var phone = new TContact.Phone();
@@ -598,6 +599,7 @@ public final class Util {
         }
         String updatedMobilePhone = form.getMobilePhone();
         if (updatedMobilePhone != null && (origin.getContact().getMobilePhone() == null || !updatedMobilePhone.trim().equalsIgnoreCase(origin.getContact().getMobilePhone().getValue()))){
+            roBoolean = true;
             var mobilePhone = new TContact.MobilePhone();
             mobilePhone.setValue(updatedMobilePhone);
             mobilePhone.setChanged(true);
@@ -610,6 +612,7 @@ public final class Util {
         String updatedMailGeneral = form.geteMailGeneral();
         if (origin.getContact().getEMails() == null ||
                 (updatedMailGeneral != null && !updatedMailGeneral.trim().equalsIgnoreCase(origin.getContact().getEMails().getEMailGeneral().getValue()))){
+            roBoolean = true;
             var eMails = new TContact.EMails();
             var eMailGeneral = new TContact.EMails.EMailGeneral();
             eMailGeneral.setValue(updatedMailGeneral);
@@ -633,7 +636,9 @@ public final class Util {
             roEmail.setChanged(true);
             ro.setEMail(roEmail);
         }
-        contact.setReestrOwner(ro);
+        if (roBoolean) {
+            contact.setReestrOwner(ro);
+        }
         result.setContact(contact);
 
         var birthInfo = new TupdateCustomer.BirthInfo();

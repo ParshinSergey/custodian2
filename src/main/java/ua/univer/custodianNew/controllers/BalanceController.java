@@ -420,6 +420,7 @@ public class BalanceController extends BaseController {
             isin = form.getIsin();
         }
         else throw new UnprocessableEntityException("ISIN не должно быть пустым !!");
+        String depositary = "";
         String code427000 = "";
         String code410000 = "";
         String unknownCode = "";
@@ -431,6 +432,7 @@ public class BalanceController extends BaseController {
         TStatementOfHoldingRowsV2 rows = (TStatementOfHoldingRowsV2) body.getStatementOfHoldings().getRows();
         List<TStatementOfHoldingRowV2> rowList = rows.getRow();
         for (var row : rowList) {
+            depositary = row.getISIN().getDepositary();
             String code = row.getBalAccount().getCode();
             switch (code){
                 case "427000": code427000 = String.valueOf(row.getQuantity()); break;
@@ -438,7 +440,7 @@ public class BalanceController extends BaseController {
                 default: unknownCode = String.valueOf(row.getQuantity()); break;
             }
         }
-        String answer = "{\"account\": \"%s\",\"isin\": \"%s\",\"code427000\": \"%s\",\"code410000\": \"%s\",\"unknownCode\": \"%s\"}".formatted(account, isin, code427000, code410000, unknownCode);
+        String answer = "{\"account\": \"%s\",\"isin\": \"%s\",\"depositary\": \"%s\",\"code427000\": \"%s\",\"code410000\": \"%s\",\"unknownCode\": \"%s\"}".formatted(account, isin, depositary, code427000, code410000, unknownCode);
 
         return ResponseEntity.ok(answer);
     }

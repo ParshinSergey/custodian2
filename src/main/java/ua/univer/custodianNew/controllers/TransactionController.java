@@ -1,6 +1,8 @@
 package ua.univer.custodianNew.controllers;
 
 import dmt.custodian2016.*;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.http.MediaType;
@@ -28,19 +30,31 @@ public class TransactionController extends BaseController{
 
     private static final String URL_TEST_ASYNC = "https://10.1.2.80/API/CPAPI.REST.dll/Send/";
     private static final String URL_TEST_ASYNC_CHECK = "https://10.1.2.80/API/CPAPI.REST.dll/ReceiveOne/";
+    private static final String URL_PROD_ASYNC = "https://10.1.2.204/API/CPAPI.REST.dll/Send/";
+    private static final String URL_PROD_ASYNC_CHECK = "https://10.1.2.204/API/CPAPI.REST.dll/ReceiveOne/";
+
 
 
     public TransactionController(Marshaller marshaller, HttpClient httpClient) {
         super(marshaller, httpClient);
     }
 
-    //@Operation(summary = "Выполнение транзакции")
+
+    @Operation(summary = "Транзакція")
     @PostMapping(value = "/TEST/add")
+    public ResponseEntity<String> transactionTest(@RequestBody @Valid FormTransaction form) {
+        form.setTest(true);
+        return transaction(form);
+    }
+
+
+    @Hidden
+    @PostMapping(value = "/secret/add")
     public ResponseEntity<String> transaction(@RequestBody @Valid FormTransaction form) {
 
-        form.setTest(true);
         long time = System.nanoTime();
         String methodName = TRANSACTION;
+        String ipAddress = form.isTest() ? URL_TEST_ASYNC : URL_PROD_ASYNC;
         Request request = getRequestWithHeader(methodName, form.isTest());
 
         TTransactionRequest transaction = new TTransactionRequest();
@@ -54,7 +68,9 @@ public class TransactionController extends BaseController{
         var agreement = new TTransactionRequest.Agreement();
         agreement.setNumber(form.getNumber());
         agreement.setDate(oneBoxCalendar(form.getDate()));
-        agreement.setAgreementCost(BigDecimal.valueOf(form.getAgreementCost()));
+        if (form.getAgreementCost() != null) {
+            agreement.setAgreementCost(BigDecimal.valueOf(form.getAgreementCost()));
+        }
         agreement.setAgreementCurrency(form.getAgreementCurrency());
         agreement.setAgreementType(BigInteger.valueOf(form.getAgreementType()));
         agreement.setAgreementTypeName(form.getAgreementTypeName());
@@ -64,6 +80,10 @@ public class TransactionController extends BaseController{
             transaction.setTransactionProcessing(TTransactionProcessing.valueOf(form.getTransactionProcessing()));
         }
         transaction.setCommitAfterRegistr(form.isCommitAfterRegistr());
+        if (form.getTransactionType() != null) {
+            transaction.setTransationType(TTransactionType.valueOf(form.getTransactionType()));
+        }
+        transaction.setRequestInResponce(form.isRequestInResponse());
 
         TParticipant participantSource = getParticipant(form);
         transaction.setParticipantSource(participantSource);
@@ -97,7 +117,7 @@ public class TransactionController extends BaseController{
 
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, URL_TEST_ASYNC, methodName);
+        return getResponseEntity(time, request, ipAddress, methodName);
 
     }
 
@@ -130,50 +150,43 @@ public class TransactionController extends BaseController{
     }
 
 
-    @GetMapping(value = "/TEST/check", consumes = MediaType.ALL_VALUE)
+
+    @GetMapping(value = "/check", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> transactionCheck(@RequestBody String check){
 
+        final String URL_FORMAT = URL_PROD_ASYNC_CHECK + "?%s=%s&%s=%s";
+        String url = String.format(URL_FORMAT, "sourceAPPidentity", Util.sourceAPP_prod, "Check", check);
+
+        return getResponse(url);
+    }
+
+
+
+    @GetMapping(value = "/TEST/check", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<String> testCheck(@RequestBody String check){
 
         final String URL_FORMAT = URL_TEST_ASYNC_CHECK + "?%s=%s&%s=%s";
         String url = String.format(URL_FORMAT, "sourceAPPidentity", Util.sourceAPP_test, "Check", check);
 
-        System.out.println("URL = " + url);
-
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .timeout(Duration.ofSeconds(20))
-                .GET()
-                .build();
-
-        HttpResponse<String> httpResponse;
-        try {
-            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new DekraException("Error connecting to Dekra-service. Message - " + e.getMessage());
-        }
-        if (httpResponse.statusCode() == 500) {
-            if(httpResponse.body() != null){
-                logger.warn(httpResponse.body());
-            }
-            throw new DekraException("Status 500 at Dekra-service Response");
-        }
-
-        String response = httpResponse.body();
-
-        Util.writeStringToFile(response, "Check", ".xml");
-
-        return ResponseEntity.ok(response);
-
-
-
+        return getResponse(url);
     }
 
+
+
     @PostMapping(value = "/TEST/block")
+    public ResponseEntity<String> testBlock(@RequestBody FormTransaction form) {
+        form.setTest(true);
+        return transactionBlock(form);
+    }
+
+
+    @Operation(summary = "Блокування ЦП для продажу.")
+    @PostMapping(value = "/block")
     public ResponseEntity<String> transactionBlock(@RequestBody FormTransaction form) {
 
-        form.setTest(true);
         long time = System.nanoTime();
         String methodName = TRANSACTION;
+        String ipAddress = form.isTest() ? URL_TEST_ASYNC : URL_PROD_ASYNC;
         Request request = getRequestWithHeader(methodName, form.isTest());
 
         TTransactionRequest transaction = new TTransactionRequest();
@@ -210,11 +223,58 @@ public class TransactionController extends BaseController{
         tbodyRequest.setTransaction(transaction);
         request.setBody(tbodyRequest);
 
-        return getResponseEntity(time, request, URL_TEST_ASYNC, methodName);
+        return getResponseEntity(time, request, ipAddress, methodName);
     }
 
 
 
+    @PostMapping(value = "/TEST/preCheck")
+    private ResponseEntity<String> preCheck (@RequestBody FormTransaction form){
+        form.setTest(true);
+        long time = System.nanoTime();
+        String methodName = TRANSACTION;
+        String ipAddress = form.isTest() ? URL_TEST_ASYNC : URL_PROD_ASYNC;
+        Request request = getRequestWithHeader(methodName, form.isTest());
+        var preCheckRequest = new TTransactionPreCheckRequest();
+        var tisin = new TISIN();
+        tisin.setISIN(form.getIsin());
+        preCheckRequest.setISIN(tisin);
+        preCheckRequest.setQuantity(form.getQuantity());
+        preCheckRequest.setAccount(form.getAccount());
+        TbodyRequest tbodyRequest = new TbodyRequest();
+        tbodyRequest.setTransactionPreCheck(preCheckRequest);
+        request.setBody(tbodyRequest);
+        return getResponseEntity(time, request, ipAddress, methodName);
+    }
 
 
+
+    private ResponseEntity<String> getResponse(String url) {
+
+        logger.info("URL = {}", url);
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(20))
+                .GET()
+                .build();
+
+        HttpResponse<String> httpResponse;
+        try {
+            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new DekraException("Error connecting to Dekra-service. Message - " + e.getMessage());
+        }
+        if (httpResponse.statusCode() == 500) {
+            if(httpResponse.body() != null){
+                logger.warn(httpResponse.body());
+            }
+            throw new DekraException("Status 500 at Dekra-service Response");
+        }
+
+        String response = httpResponse.body();
+        Util.writeStringToFile(response, "Check", ".xml");
+
+        return ResponseEntity.ok(response);
+    }
 }
